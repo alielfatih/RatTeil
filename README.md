@@ -1,10 +1,6 @@
 *RatTeil*
 
 RatTeil is a Python app to stream the Holy Quran to YouTube. Streaming the Holy Quran to YouTube has never been easier, install RatTeil, run it, and step back - RatTeil will do the rest. RatTeil will auto/manually choose reciters and surahs for each stream, download the required audio files, and start streaming them.
-*Quick start*
-1. `pip install ratteil`
-2. `pkg install wget ffmpeg`
-3. `ratteil -t youtube`
 
 *How to Install*
 
