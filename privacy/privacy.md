@@ -22,6 +22,14 @@ At RatTeil, we believe in being transparent and honest about how we handle your 
 
 - This privacy policy is effective as of [05/30/2024].
 
+RatTeil needs access to your YouTube account to live stream the Holy Quran from your machine. By granting access, you allow RatTeil to:
+
+- Upload videos to your YouTube channel
+- Manage your live streams
+- Access your YouTube account information
+
+Note that RatTeil only runs on your local machine and does not store or share your YouTube credentials or account information with any third parties. We respect your privacy and security.
+
 *Contact Us*
 
 - If you have any questions about this privacy policy (although we can't imagine what they would be, since we don't collect any data!), please contact us at alixannu01@gmail.com.
