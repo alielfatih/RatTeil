@@ -24,6 +24,11 @@ Examples:
   ratteil --list-surahs                     List all available surahs
   ratteil --download --surahs 1-10         Download surahs 1-10
   ratteil --stream --youtube                Stream to YouTube
+  
+YouTube Authentication (for --youtube):
+  - Service Account: Set YOUTUBE_CLIENT_SECRETS=path/to/service-account.json
+  - Device Flow: Set YOUTUBE_CLIENT_SECRETS=path/to/client-secrets.json
+  - API Key: Set YOUTUBE_API_KEY=your_api_key
         ''',
     )
     
@@ -42,6 +47,15 @@ Examples:
         '--config',
         type=str,
         help='Path to configuration file',
+    )
+    
+    # YouTube authentication mode
+    parser.add_argument(
+        '--youtube-auth',
+        type=str,
+        choices=['service_account', 'device_flow', 'api_key'],
+        default='device_flow',
+        help='YouTube authentication mode for headless operation',
     )
     
     # Subcommands
@@ -133,11 +147,6 @@ Examples:
         'list',
         help='List available items',
     )
-    list_subparsers = list_parser.add_subparsers(
-        dest='list_item',
-        title='List items',
-    )
-    
     list_parser.add_argument(
         '--reciters',
         action='store_true',
@@ -189,6 +198,19 @@ Examples:
         '--reciters',
         type=str,
         help='Reciters to validate',
+    )
+    
+    # YouTube auth test command
+    yt_auth_parser = subparsers.add_parser(
+        'youtube-auth-test',
+        help='Test YouTube authentication',
+    )
+    yt_auth_parser.add_argument(
+        '--mode',
+        type=str,
+        choices=['service_account', 'device_flow', 'api_key'],
+        default='device_flow',
+        help='Authentication mode to test',
     )
     
     return parser

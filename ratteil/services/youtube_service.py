@@ -1,72 +1,187 @@
-"""YouTube service for managing YouTube Live streaming."""
+"""YouTube service for managing YouTube Live streaming.
+
+Supports multiple authentication methods for headless environments:
+- Service Account (JSON key file) - Recommended for servers
+- OAuth2 Device Flow - For manual authentication
+- API Key - Read-only operations only
+"""
 
 import datetime
+import json
+import sys
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Literal
 
 from ratteil.config import get_settings, YouTubeError
 from ratteil.models.stream import StreamDetails
 
 
+# Authentication mode type
+AuthMode = Literal["service_account", "device_flow", "api_key"]
+
+
 class YouTubeService:
-    """Service for YouTube Live API operations."""
+    """Service for YouTube Live API operations.
     
-    def __init__(self):
-        """Initialize the YouTube service."""
+    Supports headless authentication for servers without UI/browser.
+    """
+    
+    def __init__(
+        self,
+        auth_mode: AuthMode = "device_flow",
+        service_account_file: Optional[str] = None,
+        api_key: Optional[str] = None,
+    ):
+        """Initialize the YouTube service.
+        
+        Args:
+            auth_mode: Authentication mode to use
+                - 'service_account': Use service account JSON key
+                - 'device_flow': Use OAuth2 device flow (manual code entry)
+                - 'api_key': Use API key (read-only)
+            service_account_file: Path to service account JSON file
+            api_key: YouTube API key for read-only operations
+        """
         self.settings = get_settings()
+        self.auth_mode = auth_mode
+        self.service_account_file = service_account_file
+        self.api_key = api_key or self.settings.YOUTUBE_API_KEY
         self._service = None
     
     def _get_authenticated_service(self):
         """Get authenticated YouTube service.
         
-        This requires OAuth2 setup with client secrets.
+        Supports headless authentication without browser interaction.
         """
         if self._service is not None:
             return self._service
         
         try:
             from googleapiclient.discovery import build
-            from oauth2client.client import flow_from_clientsecrets
-            from oauth2client.file import Storage
-            from oauth2client.tools import run_flow
+            from google.oauth2 import service_account
+            from google_auth_oauthlib.flow import InstalledAppFlow
         except ImportError as e:
             raise YouTubeError(
                 "Google API client libraries not installed. "
-                "Install with: pip install google-api-python-client oauth2client"
+                "Install with: pip install google-api-python-client google-auth google-auth-oauthlib"
             ) from e
         
-        # Get credentials
-        client_secrets_file = self.settings.YOUTUBE_CLIENT_SECRETS
-        credentials_file = self.settings.YOUTUBE_CREDENTIALS_FILE
+        if self.auth_mode == "service_account":
+            return self._authenticate_service_account(build)
+        elif self.auth_mode == "device_flow":
+            return self._authenticate_device_flow(build)
+        elif self.auth_mode == "api_key":
+            return self._authenticate_api_key(build)
+        else:
+            raise YouTubeError(f"Unknown auth mode: {self.auth_mode}")
+    
+    def _authenticate_service_account(self, build):
+        """Authenticate using service account JSON key."""
+        from google.oauth2 import service_account
         
-        if not client_secrets_file:
-            raise YouTubeError("YOUTUBE_CLIENT_SECRETS not configured")
+        if not self.service_account_file:
+            service_account_file = self.settings.YOUTUBE_CLIENT_SECRETS
+        else:
+            service_account_file = self.service_account_file
         
-        # Load credentials from file or run OAuth flow
-        storage = Storage(credentials_file or 'credentials.json')
-        credentials = storage.get()
+        if not service_account_file:
+            raise YouTubeError(
+                "Service account file not configured. "
+                "Set YOUTUBE_CLIENT_SECRETS or provide service_account_file."
+            )
         
-        if credentials is None or credentials.invalid:
-            flow = flow_from_clientsecrets(
-                client_secrets_file,
-                scope=[
+        if not Path(service_account_file).exists():
+            raise YouTubeError(
+                f"Service account file not found: {service_account_file}"
+            )
+        
+        try:
+            credentials = service_account.Credentials.from_service_account_file(
+                service_account_file,
+                scopes=[
                     "https://www.googleapis.com/auth/youtube",
                     "https://www.googleapis.com/auth/youtube.readonly",
                 ],
-                redirect_uri="urn:ietf:wg:oauth:2.0:oob",
             )
-            credentials = run_flow(flow, storage)
+            
+            self._service = build(
+                'youtube',
+                'v3',
+                credentials=credentials,
+            )
+            return self._service
+        except Exception as e:
+            raise YouTubeError(f"Service account authentication failed: {e}") from e
+    
+    def _authenticate_device_flow(self, build):
+        """Authenticate using OAuth2 device flow (headless).
         
-        # Build service
-        self._service = build(
-            'youtube',
-            'v3',
-            http=credentials.authorize(
-                __import__('httplib2').Http()
-            ),
-        )
+        This prints a URL and code for the user to manually authenticate.
+        """
+        from google_auth_oauthlib.flow import InstalledAppFlow
+        import httplib2
         
-        return self._service
+        client_secrets_file = self.settings.YOUTUBE_CLIENT_SECRETS
+        credentials_file = self.settings.YOUTUBE_CREDENTIALS_FILE or 'youtube_credentials.json'
+        
+        if not client_secrets_file:
+            raise YouTubeError(
+                "OAuth2 client secrets file not configured. "
+                "Set YOUTUBE_CLIENT_SECRETS."
+            )
+        
+        if not Path(client_secrets_file).exists():
+            raise YouTubeError(
+                f"Client secrets file not found: {client_secrets_file}"
+            )
+        
+        try:
+            # Use device flow for headless authentication
+            from google_auth_oauthlib.flow import InstalledAppFlow
+            
+            flow = InstalledAppFlow.from_client_secrets_file(
+                client_secrets_file,
+                scopes=[
+                    "https://www.googleapis.com/auth/youtube",
+                    "https://www.googleapis.com/auth/youtube.readonly",
+                ],
+            )
+            
+            # For headless, we need to use the console flow
+            # This will print a URL for the user to visit
+            print("\n" + "="*60)
+            print("YOUTUBE AUTHENTICATION REQUIRED")
+            print("="*60)
+            print("Please visit the following URL in a browser:")
+            
+            credentials = flow.run_console()
+            
+            self._service = build(
+                'youtube',
+                'v3',
+                credentials=credentials,
+            )
+            return self._service
+        except Exception as e:
+            raise YouTubeError(f"OAuth2 authentication failed: {e}") from e
+    
+    def _authenticate_api_key(self, build):
+        """Authenticate using API key (read-only)."""
+        if not self.api_key:
+            raise YouTubeError(
+                "API key not configured. "
+                "Set YOUTUBE_API_KEY or provide api_key."
+            )
+        
+        try:
+            self._service = build(
+                'youtube',
+                'v3',
+                developerKey=self.api_key,
+            )
+            return self._service
+        except Exception as e:
+            raise YouTubeError(f"API key authentication failed: {e}") from e
     
     def insert_stream(
         self,
@@ -268,3 +383,22 @@ class YouTubeService:
         stream_details.mark_live()
         
         return stream_id, broadcast_id, rtmp_url
+    
+    def get_available_auth_modes(self) -> list:
+        """Get list of available authentication modes."""
+        return ["service_account", "device_flow", "api_key"]
+    
+    def test_authentication(self) -> bool:
+        """Test if authentication is working.
+        
+        Returns:
+            True if authentication succeeds
+        """
+        try:
+            service = self._get_authenticated_service()
+            # Try a simple API call
+            service.channels().list(part="id", mine=True).execute()
+            return True
+        except Exception as e:
+            print(f"Authentication test failed: {e}")
+            return False

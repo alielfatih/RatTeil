@@ -11,7 +11,7 @@ from ratteil.repositories.reciter_repository import LocalReciterRepository
 from ratteil.services.randomizer_service import RandomizerService
 from ratteil.services.download_service import DownloadService
 from ratteil.services.stream_service import StreamService
-from ratteil.services.youtube_service import YouTubeService
+from ratteil.services.youtube_service import YouTubeService, AuthMode
 from ratteil.services.audio_service import AudioService
 
 
@@ -78,20 +78,25 @@ def run_ratteil(args) -> int:
     
     logger.info(f"Starting RatTeil v{settings.APP_VERSION}")
     
+    # Handle YouTube auth mode from args
+    youtube_auth_mode = getattr(args, 'youtube_auth', 'device_flow')
+    
     # Handle commands
     if args.command == 'download':
         return handle_download(args)
     elif args.command == 'stream':
-        return handle_stream(args)
+        return handle_stream(args, youtube_auth_mode)
     elif args.command == 'list':
         return handle_list(args)
     elif args.command == 'prepare':
         return handle_prepare(args)
     elif args.command == 'validate':
         return handle_validate(args)
+    elif args.command == 'youtube-auth-test':
+        return handle_youtube_auth_test(args)
     else:
         # Default behavior (backward compatibility)
-        return handle_default(args)
+        return handle_default(args, youtube_auth_mode)
 
 
 def handle_download(args) -> int:
@@ -139,7 +144,7 @@ def handle_download(args) -> int:
     return 0
 
 
-def handle_stream(args) -> int:
+def handle_stream(args, youtube_auth_mode: str = 'device_flow') -> int:
     """Handle stream command."""
     logger.info("Starting stream operation")
     
@@ -200,7 +205,7 @@ def handle_stream(args) -> int:
     
     # Stream
     if args.youtube:
-        return handle_youtube_stream(stream_details)
+        return handle_youtube_stream(stream_details, youtube_auth_mode)
     else:
         # Local streaming (simulated)
         def on_progress(stream_file, current, total):
@@ -215,11 +220,11 @@ def handle_stream(args) -> int:
     return 0
 
 
-def handle_youtube_stream(stream_details) -> int:
+def handle_youtube_stream(stream_details, youtube_auth_mode: str = 'device_flow') -> int:
     """Handle YouTube streaming."""
     logger.info("Starting YouTube stream")
     
-    youtube_service = YouTubeService()
+    youtube_service = YouTubeService(auth_mode=youtube_auth_mode)
     
     try:
         stream_id, broadcast_id, rtmp_url = youtube_service.create_and_start_stream(
@@ -271,9 +276,12 @@ def handle_list(args) -> int:
     
     else:
         # List both
-        handle_list_type('reciters')
+        args.reciters = True
+        handle_list(args)
         print("\n")
-        handle_list_type('surahs')
+        args.reciters = False
+        args.surahs = True
+        handle_list(args)
     
     return 0
 
@@ -374,7 +382,33 @@ def handle_validate(args) -> int:
         return 1
 
 
-def handle_default(args) -> int:
+def handle_youtube_auth_test(args) -> int:
+    """Handle YouTube authentication test command."""
+    logger.info("Testing YouTube authentication")
+    
+    auth_mode = getattr(args, 'mode', 'device_flow')
+    youtube_service = YouTubeService(auth_mode=auth_mode)
+    
+    print(f"\nTesting authentication mode: {auth_mode}")
+    print("-" * 50)
+    
+    try:
+        success = youtube_service.test_authentication()
+        if success:
+            print("✅ Authentication successful!")
+            logger.info("YouTube authentication test passed")
+            return 0
+        else:
+            print("❌ Authentication failed!")
+            logger.error("YouTube authentication test failed")
+            return 1
+    except Exception as e:
+        print(f"❌ Authentication error: {e}")
+        logger.error(f"YouTube authentication test failed: {e}")
+        return 1
+
+
+def handle_default(args, youtube_auth_mode: str = 'device_flow') -> int:
     """Handle default behavior (backward compatibility)."""
     logger.info("Running in default mode")
     
