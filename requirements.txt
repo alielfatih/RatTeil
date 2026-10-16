@@ -1,18 +1,12 @@
 # Core dependencies (required)
 requests>=2.28.0
-pydantic>=2.0.0
 
 # YouTube API (optional, for streaming to YouTube)
-# Use one of these authentication methods:
-# 1. Service Account (recommended for servers):
-#    google-api-python-client>=2.0.0
-#    google-auth>=2.0.0
-# 2. OAuth2 Device Flow:
-#    google-api-python-client>=2.0.0
-#    google-auth>=2.0.0
-#    google-auth-oauthlib>=0.4.0
-# 3. API Key (read-only):
-#    google-api-python-client>=2.0.0
+# Install with: pip install google-api-python-client google-auth google-auth-oauthlib
+# Or for specific auth modes:
+# - Service Account: pip install google-api-python-client google-auth
+# - Device Flow: pip install google-api-python-client google-auth google-auth-oauthlib
+# - API Key: pip install google-api-python-client
 
 # FFmpeg (required for audio processing)
 # Install via system package manager:
