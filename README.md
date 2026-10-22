@@ -1,236 +1,72 @@
-# RatTeil - Quran Recitation Streaming Tool
+*RatTeil*
 
-[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)
+RatTeil is a Python app to stream the Holy Quran to YouTube. Streaming the Holy Quran to YouTube has never been easier, install RatTeil, run it, and step back - RatTeil will do the rest. RatTeil will auto/manually choose reciters and surahs for each stream, download the required audio files, and start streaming them.
 
-RatTeil is a Python application for downloading, managing, and streaming Quran recitations from various reciters. It provides functionality to:
+*How to Install*
 
-- Download Quran audio from multiple reciters
-- Generate random playlists of surahs and reciters
-- Stream to local or YouTube Live
-- Merge audio files for continuous playback
+*Android*
 
-## Features
+1. Install Termux app.
+2. Run `pkg update -y`.
+3. Then `pkg install python wget ffmpeg -y`.
+4. Then `python -m pip install ratteil`.
+5. Run `ratteil -h` to see available options.
 
-- **Clean Architecture**: Proper separation of concerns with repositories, services, and models
-- **Type Safety**: Full type hints throughout the codebase
-- **Async Support**: Async/await support for I/O operations
-- **Configuration Management**: Environment-based configuration with Pydantic
-- **Dependency Injection**: Easy to test and extend
-- **CLI Interface**: Comprehensive command-line interface
+*Linux, Debian, etc.*
 
-## Installation
+1. Run `apt-get update -y`.
+2. Then `apt-get install python wget ffmpeg -y`.
+3. Then `python -m pip install ratteil`.
+4. Run `ratteil -h` to see available options.
 
-### Prerequisites
+Or
 
-- Python 3.8 or higher
-- FFmpeg (for audio processing)
-- pip (Python package manager)
+1. Clone RatTeil repo and change to the RatTeil folder.
+2. Run `sh install.sh`.
+3. Run `python __main__.py -h` to see options.
 
-### Install from PyPI
+Or
 
-```bash
-pip install ratteil
-```
+1. Download RatTeil package from GitHub or PyPI.
+2. Install requirements with `apt-get install python ffmpeg wget -y`.
+3. Run `python -m pip install <ratteil_package_file_path>`.
 
-### Install from Source
+*Quick Start*
 
-```bash
-# Clone the repository
-git clone https://github.com/example/ratteil.git
-cd ratteil
+Before running this command, make sure you have:
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+- Placed your images/videos for stream background under `~/RatTeil-resources/imgs/`
+- Placed your video introduction and conclusion under `~/RatTeil-resources/fixer/` ( filenames must be `introduction.mp4` and `conclusion.mp4`)
 
-# Install dependencies
-pip install -e .
+1. Run `python -m pip install ratteil`.
+2. Run `ratteil -t youtube`.
+3. Copy authentication links.
+4. Follow the Google authentication link.
+5. Enter the authentication code/token and verify your authority.
+6. Done; the stream will start in a few moments.
+7. Visit your YouTube channel or Facebook page to see your stream.
 
-# For development
-pip install -r requirements-dev.txt
-```
-
-### Install FFmpeg
-
-FFmpeg is required for audio processing:
-
-- **Ubuntu/Debian**: `sudo apt-get install ffmpeg`
-- **Mac**: `brew install ffmpeg`
-- **Windows**: Download from [FFmpeg official site](https://ffmpeg.org/)
-
-## Configuration
-
-Copy the example environment file and update with your settings:
-
-```bash
-cp .env.example .env
-# Edit .env with your settings
-```
-
-### Required Configuration
-
-- `RATTEIL_AC`: Access key for your API
-- `RATTEIL_SE`: Secret key for your API
-
-### Optional Configuration
-
-- `DEBUG`: Enable debug logging
-- `DATA_DIR`: Directory for data files
-- `AUDIO_DIR`: Directory for downloaded audio
-- `STREAM_DIR`: Directory for stream files
-- `YOUTUBE_API_KEY`: YouTube API key for streaming
-- `MAX_RECITERS`: Maximum number of reciters to use
-- `MAX_SURAHS`: Maximum number of surahs to use
-
-## Usage
-
-### Basic Usage
-
-```bash
-# Run with default settings (random selection)
-ratteil
-
-# List available reciters
-ratteil --list-reciters
-
-# List available surahs
-ratteil --list-surahs
-
-# Stream specific surahs by specific reciters
-ratteil --surahs 1,2,3 --reciters alafasy,husary
-
-# Stream random surahs by random reciters
-ratteil --random --surahs-count 5 --reciters-count 3
-```
-
-### Download Audio
-
-```bash
-# Download all surahs by a specific reciter
-ratteil download --reciters alafasy --all
-
-# Download specific surahs
-ratteil download --surahs 1-10 --reciters alafasy,husary
-
-# Download to custom directory
-ratteil download --surahs 1,2,3 --reciters alafasy --output-dir ./my_audio
-```
-
-### Stream to YouTube
-
-```bash
-# Stream to YouTube Live
-ratteil stream --surahs 1,2,3 --reciters alafasy --youtube
-
-# With custom title and description
-ratteil stream --random --surahs-count 5 --youtube \
-    --title "My Quran Stream" \
-    --description "Automated Quran recitation"
-```
-
-### Prepare Stream Files
-
-```bash
-# Prepare files without streaming
-ratteil prepare --surahs 1-5 --reciters alafasy,husary
-
-# Validate stream configuration
-ratteil validate --surahs 1-5 --reciters alafasy,husary
-```
-
-## Architecture
-
-### Directory Structure
+*RatTeil Available Commands and Options*
 
 ```
-ratteil/
-├── __init__.py          # Package initialization
-├── __main__.py          # Entry point for module execution
-├── config/
-│   ├── __init__.py
-│   ├── exceptions.py    # Custom exceptions
-│   └── settings.py      # Application settings
-├── models/
-│   ├── __init__.py
-│   ├── reciter.py       # Reciter and Moshaf models
-│   ├── stream.py        # Stream models
-│   └── surah.py         # Surah models
-├── repositories/
-│   ├── __init__.py
-│   ├── reciter_repository.py  # Reciter data access
-│   └── surah_repository.py    # Surah data access
-├── services/
-│   ├── __init__.py
-│   ├── audio_service.py        # Audio processing
-│   ├── download_service.py     # Download functionality
-│   ├── randomizer_service.py   # Random selection
-│   ├── stream_service.py       # Streaming
-│   └── youtube_service.py      # YouTube integration
-├── utils/
-│   ├── __init__.py
-│   ├── file_utils.py     # File utilities
-│   ├── logging.py        # Logging configuration
-│   └── validation.py     # Validation functions
-└── cli/
-    ├── __init__.py
-    ├── parser.py         # Argument parsing
-    └── commands.py        # CLI commands
+console usage: ratteil [-h] [-l] [-m] [-ms] [-n] [-R [...]] [-r] [-sn] [-s] [--no-download] [--no-validation] -t [...]
 ```
 
-### Key Components
+| Command | Description |
+| --- | --- |
+| -h, --help | Show help message. |
+| -l, --list | List all available reciters. |
+| -m, --min | Set the minimum length for stream validation in minutes; default is 120 minutes (2 hours). |
+| -ms, --streams | Set the number of streams per run; each stream will be 75 minutes or less. This value will automatically recalculate the minimum stream length for validation. |
+| -n | Set the number of reciters per stream; default is randomly between 3-7. |
+| -R, --reciter | Manually choose stream reciter/reciters. |
+| -r, --resume | Coming soon. |
+| -sn | Set the number of surahs per stream; default is randomly between 20-50. |
+| --no-download | By setting this option, RatTeil will pass the resource downloading process and start streaming pre-existing resources. Note that this will stop the stream validation process. |
+| --no-validation | By setting this option, the stream validation process will stop. |
+| -t, --site | Set the website to stream to. |
 
-- **Models**: Dataclasses representing domain objects (Surah, Reciter, StreamDetails, etc.)
-- **Repositories**: Data access layer (LocalSurahRepository, LocalReciterRepository)
-- **Services**: Business logic (AudioService, DownloadService, StreamService, etc.)
-- **Utils**: Helper functions (file operations, validation, logging)
-- **CLI**: Command-line interface
+*Examples*
 
-## Development
-
-### Running Tests
-
-```bash
-pytest
-pytest --cov=ratteil --cov-report=html
-```
-
-### Code Formatting
-
-```bash
-black ratteil
-isort ratteil
-```
-
-### Type Checking
-
-```bash
-mypy ratteil
-```
-
-### Linting
-
-```bash
-flake8 ratteil
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin feature/your-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- All Quran audio is sourced from public domain or properly licensed sources
-- Special thanks to all the reciters whose beautiful recitations make this possible
-
-## Contact
-
-For questions or support, please open an issue on GitHub.
+1. Run `ratteil -sn 20 -t youtube`. RatTeil will randomly choose 20 surahs, download them, and start streaming them to YouTube.
+2. Run `ratteil -R hazza -m 400 -t youtube facebook`. RatTeil will set Hazza as the stream reciter, set the minimum validation value to 400 minutes.
