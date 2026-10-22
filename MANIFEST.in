@@ -1,0 +1,8 @@
+include src/ratteil/requirements.txt
+include src/ratteil/install.sh
+include src/ratteil/client_secrets.json
+include README.md	
+include LICENSE
+recursive-include src/ratteil/imgs/ *
+recursive-include src/ratteil/fixer/ *
+recursive-include src/ratteil/docs/ *
