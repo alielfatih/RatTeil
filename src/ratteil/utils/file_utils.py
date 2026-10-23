@@ -12,7 +12,7 @@ def surah_index_to_filename(x: int | str) -> str:
     else:
         raise ValueError(f"{x} isn't valid surah index.")
 
-def filename_resolve(filename: str) -> list[str]:
-    """Get reciter code, surah number, and moshaf type from filename."""
+def filename_resolve(filename: str) -> list[str | int]:
+    """Get surah index, reciter code, and moshaf type from filename."""
     parts = filename[6:-4].split("@@")
     return [parts[-1], parts[0].split("/")[-1], parts[1]]

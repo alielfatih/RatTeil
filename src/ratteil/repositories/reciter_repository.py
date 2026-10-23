@@ -33,29 +33,29 @@ class ReciterRepository(ReciterRepositoryProtocol):
             from ratteil.reciters import reciters
             self.reciters_db = reciters
     
-    def get_reciter(self, code: str) -> Reciter:
+    def get_reciter(self, reciter_id: int | str) -> Reciter:
         """
-        Get a single reciter by code.
+        Get a single reciter by ID.
         
         Args:
-            code: The reciter code
+            reciter_id: The reciter ID
             
         Returns:
             Reciter: The reciter information
         """
-        return Reciter(code, self.reciters_db)
+        return Reciter(reciter_id, self.reciters_db)
     
-    def get_reciters(self, codes: List[str]) -> List[Reciter]:
+    def get_reciters(self, reciter_ids: List[int | str]) -> List[Reciter]:
         """
-        Get multiple reciters by codes.
+        Get multiple reciters by IDs.
         
         Args:
-            codes: List of reciter codes
+            reciter_ids: List of reciter IDs
             
         Returns:
             List[Reciter]: List of reciter information
         """
-        return [self.get_reciter(code) for code in codes]
+        return [self.get_reciter(reciter_id) for reciter_id in reciter_ids]
     
     def list_all_reciters(self) -> Dict[str, Dict[str, Any]]:
         """
@@ -66,18 +66,21 @@ class ReciterRepository(ReciterRepositoryProtocol):
         """
         return self.reciters_db
     
-    def get_reciters_with_multi_moshafs(self) -> List[str]:
+    def get_reciters_with_multi_moshafs(self) -> List[int | str]:
         """
         Get list of reciters with multiple moshafs.
         
         Returns:
-            List of reciter codes that have multiple moshafs
+            List of reciter IDs that have multiple moshafs
         """
+        from ratteil.reciters import reciters_by_id
         multi_reciters = []
         for code, reciter_data in self.reciters_db.items():
             moshafs = reciter_data.get("moshaf", [])
             if len(moshafs) > 1:
-                multi_reciters.append(code)
+                reciter_id = reciter_data.get("id")
+                if reciter_id:
+                    multi_reciters.append(reciter_id)
         return multi_reciters
     
     def search_reciters(self, query: str, limit: int = 10) -> List[Reciter]:

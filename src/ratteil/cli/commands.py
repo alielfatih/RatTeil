@@ -26,7 +26,7 @@ logger = get_logger("ratteil.cli.commands")
 def pre_launcher(
     options: any,
     reciters_db: dict,
-    reciters_codes_db: List[str],
+    reciters_ids_db: List[int | str],
     resources_path: Path,
     package_path: Path
 ) -> None:
@@ -38,7 +38,7 @@ def pre_launcher(
     Args:
         options: Parsed command line options
         reciters_db: Reciters database
-        reciters_codes_db: List of reciter codes
+        reciters_ids_db: List of reciter IDs
         resources_path: Resources directory
         package_path: Package directory
     """
@@ -56,7 +56,7 @@ def pre_launcher(
     if options.reciter:
         temp_reciters_list = options.reciter
     else:
-        temp_reciters_list = reciters_codes_db
+        temp_reciters_list = reciters_ids_db
     
     selected_surahs_list = []
     download_service = DownloadService()
@@ -131,7 +131,7 @@ def launcher(stream_service: StreamService, sites: List[str]) -> None:
 
 def handle_reciters_list(
     reciters_db: dict,
-    reciters_codes_db: List[str],
+    reciters_ids_db: List[int | str],
     resources_path: Path,
     package_path: Path,
     use_api: bool = True
@@ -141,7 +141,7 @@ def handle_reciters_list(
     
     Args:
         reciters_db: Reciters database
-        reciters_codes_db: List of reciter codes
+        reciters_ids_db: List of reciter IDs
         resources_path: Resources directory
         package_path: Package directory
         use_api: Whether to use API method (default: True)
@@ -168,7 +168,7 @@ def handle_reciters_list(
     
     # Fallback to old static method
     reciters_list = RandomizerService.get_available_reciters_list(
-        reciters_codes_db, reciters_db
+        reciters_ids_db, reciters_db
     )
     reciters_list.sort()
     for reciter in reciters_list:

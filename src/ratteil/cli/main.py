@@ -352,7 +352,7 @@ def handle_stream_command(args: argparse.Namespace) -> int:
         
         for reciter in data_manager.get_reciters():
             code = reciter.code
-            recitersCodesDB.append(code)
+            recitersIdsDB.append(code)
             recitersDB[code] = {
                 "id": reciter.id,
                 "name": reciter.name,
@@ -365,7 +365,7 @@ def handle_stream_command(args: argparse.Namespace) -> int:
     except Exception as api_error:
         logger.warning(f"API method failed, falling back to static data: {api_error}")
         # Fallback to old static method
-        from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
+        from ratteil.reciters import reciters_id as recitersIdsDB, reciters as recitersDB
     
     # Convert args to options-like object
     class Options:
@@ -386,7 +386,7 @@ def handle_stream_command(args: argparse.Namespace) -> int:
         pre_launcher(
             options,
             recitersDB,
-            recitersCodesDB,
+            recitersIdsDB,
             resources_path,
             package_path
         )
@@ -430,11 +430,11 @@ def handle_download_command(args: argparse.Namespace) -> int:
             
             # Convert API reciters to old format for compatibility
             recitersDB = {}
-            recitersCodesDB = []
+            recitersIdsDB = []
             
             for reciter in data_manager.get_reciters():
                 code = reciter.code
-                recitersCodesDB.append(code)
+                recitersIdsDB.append(code)
                 recitersDB[code] = {
                     "id": reciter.id,
                     "name": reciter.name,
@@ -447,7 +447,7 @@ def handle_download_command(args: argparse.Namespace) -> int:
         except Exception as api_error:
             logger.warning(f"API method failed, falling back to static data: {api_error}")
             # Fallback to old static method
-            from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
+            from ratteil.reciters import reciters_id as recitersIdsDB, reciters as recitersDB
         
         # Generate surahs list
         if args.all:
@@ -539,13 +539,13 @@ def handle_list_command(args: argparse.Namespace) -> int:
         # Fallback to old method if API fails
         try:
             from ratteil.cli.commands import handle_reciters_list
-            from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
+            from ratteil.reciters import reciters_id as recitersIdsDB, reciters as recitersDB
             
             if args.resource in ["reciters", "all"]:
                 print("\nAvailable Reciters:")
                 handle_reciters_list(
                     recitersDB,
-                    recitersCodesDB,
+                    recitersIdsDB,
                     resources_path,
                     package_path,
                     use_api=False  # Use static data
@@ -670,11 +670,11 @@ def handle_prepare_command(args: argparse.Namespace) -> int:
             
             # Convert API reciters to old format for compatibility
             recitersDB = {}
-            recitersCodesDB = []
+            recitersIdsDB = []
             
             for reciter in data_manager.get_reciters():
                 code = reciter.code
-                recitersCodesDB.append(code)
+                recitersIdsDB.append(code)
                 recitersDB[code] = {
                     "id": reciter.id,
                     "name": reciter.name,
@@ -687,7 +687,7 @@ def handle_prepare_command(args: argparse.Namespace) -> int:
         except Exception as api_error:
             logger.warning(f"API method failed, falling back to static data: {api_error}")
             # Fallback to old static method
-            from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
+            from ratteil.reciters import reciters_id as recitersIdsDB, reciters as recitersDB
         
         stream_service = StreamService(
             recitersDB,
@@ -751,11 +751,11 @@ def handle_validate_command(args: argparse.Namespace) -> int:
             
             # Convert API reciters to old format for compatibility
             recitersDB = {}
-            recitersCodesDB = []
+            recitersIdsDB = []
             
             for reciter in data_manager.get_reciters():
                 code = reciter.code
-                recitersCodesDB.append(code)
+                recitersIdsDB.append(code)
                 recitersDB[code] = {
                     "id": reciter.id,
                     "name": reciter.name,
@@ -768,7 +768,7 @@ def handle_validate_command(args: argparse.Namespace) -> int:
         except Exception as api_error:
             logger.warning(f"API method failed, falling back to static data: {api_error}")
             # Fallback to old static method
-            from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
+            from ratteil.reciters import reciters_id as recitersIdsDB, reciters as recitersDB
         
         stream_service = StreamService(
             recitersDB,

@@ -8,7 +8,7 @@ from ratteil.config.constants import DEFAULT_DATA_DIR, DEFAULT_FIXER_DIR, DEFAUL
 from pathlib import Path
 from ratteil.cli.parser import create_parser
 from ratteil.cli.commands import pre_launcher, handle_reciters_list, handle_copyright
-from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
+from ratteil.reciters import reciters_id as recitersIdsDB, reciters as recitersDB
 import sys
 import os
 
@@ -39,7 +39,7 @@ def ratteil():
     """Main entry point for RatTeil application."""
     ensure_resources_initialized(RATTEIL_RESOURCES, RATTEIL_PATH)
     
-    parser = create_parser(recitersCodesDB)
+    parser = create_parser(recitersIdsDB)
     args = parser.parse_args()
     
     active_reciters_db = recitersDB
@@ -53,11 +53,11 @@ def ratteil():
         sys.exit(0)
         
     if args.reciters_list:
-        handle_reciters_list(active_reciters_db, recitersCodesDB, RATTEIL_RESOURCES, RATTEIL_PATH)
+        handle_reciters_list(active_reciters_db, recitersIdsDB, RATTEIL_RESOURCES, RATTEIL_PATH)
     elif args.copyright:
         handle_copyright(RATTEIL_PATH)
     else:
-        pre_launcher(args, active_reciters_db, recitersCodesDB, RATTEIL_RESOURCES, RATTEIL_PATH)
+        pre_launcher(args, active_reciters_db, recitersIdsDB, RATTEIL_RESOURCES, RATTEIL_PATH)
 
 
 if __name__ == "__main__":

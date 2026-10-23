@@ -16,7 +16,7 @@ class SurahInfo:
     
     Attributes:
         index: The surah index (1-114)
-        code: The reciter code
+        reciter_id: The reciter ID (primary identifier)
         mtype: The moshaf type
         reciters_db: The reciters database (excluded from repr)
         id: The surah ID (computed from index)
@@ -25,9 +25,10 @@ class SurahInfo:
         moshaf: The moshaf name
         dl_name: The download filename
         url: The base URL for the surah audio
+        code: The reciter code (for backward compatibility, computed from reciter_id)
     """
     index: int | str
-    code: str
+    reciter_id: int | str
     mtype: int | str
     reciters_db: Dict = field(repr=False)
     
@@ -37,17 +38,26 @@ class SurahInfo:
     moshaf: str = field(init=False)
     dl_name: str = field(init=False)
     url: str = field(init=False)
+    code: str = field(init=False)  # For backward compatibility
 
     def __post_init__(self):
         """Initialize computed fields."""
         # Import here to avoid circular imports
         from ratteil.models.reciter import Reciter
+        from ratteil.reciters import reciters_by_id
         from ratteil.surahs import surah_list as su_list
         
         self.id = str(self.index)
         surah_key = f"surah_{self.id}"
         self.name = su_list.get(surah_key, {}).get("name", "")
-        self.reciter = Reciter(self.code, self.reciters_db)
+        
+        # Get code from reciter_id for backward compatibility
+        if isinstance(self.reciter_id, int):
+            self.code = reciters_by_id.get(self.reciter_id, str(self.reciter_id))
+        else:
+            self.code = reciters_by_id.get(int(self.reciter_id), str(self.reciter_id))
+        
+        self.reciter = Reciter(self.reciter_id, self.reciters_db)
         self.moshaf = self.reciter.get_moshaf_name_url(int(self.mtype))
         self.dl_name = f"{self.code}@@{self.mtype}@@{self.id}.mp3"
         self.url = self.reciter.get_moshaf_name_url(int(self.mtype), True)

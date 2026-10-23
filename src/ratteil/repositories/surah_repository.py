@@ -34,13 +34,13 @@ class SurahRepository(SurahRepositoryProtocol):
             from ratteil.surahs import surah_list
             self.surahs_db = surah_list
     
-    def get_surah(self, surah_id: int | str, reciter_code: str, moshaf_type: int | str) -> SurahInfo:
+    def get_surah(self, surah_id: int | str, reciter_id: int | str, moshaf_type: int | str) -> SurahInfo:
         """
-        Get a single surah by ID, reciter code, and moshaf type.
+        Get a single surah by ID, reciter ID, and moshaf type.
         
         Args:
             surah_id: The surah ID (1-114)
-            reciter_code: The reciter code
+            reciter_id: The reciter ID
             moshaf_type: The moshaf type
             
         Returns:
@@ -48,25 +48,25 @@ class SurahRepository(SurahRepositoryProtocol):
         """
         return SurahInfo(
             index=surah_id,
-            code=reciter_code,
+            reciter_id=reciter_id,
             mtype=moshaf_type,
             reciters_db={}
         )
     
-    def get_surahs(self, surah_ids: List[int | str], reciter_code: str, moshaf_type: int | str) -> List[SurahInfo]:
+    def get_surahs(self, surah_ids: List[int | str], reciter_id: int | str, moshaf_type: int | str) -> List[SurahInfo]:
         """
-        Get multiple surahs by IDs, reciter code, and moshaf type.
+        Get multiple surahs by IDs, reciter ID, and moshaf type.
         
         Args:
             surah_ids: List of surah IDs
-            reciter_code: The reciter code
+            reciter_id: The reciter ID
             moshaf_type: The moshaf type
             
         Returns:
             List[SurahInfo]: List of surah information
         """
         return [
-            self.get_surah(surah_id, reciter_code, moshaf_type)
+            self.get_surah(surah_id, reciter_id, moshaf_type)
             for surah_id in surah_ids
         ]
     
@@ -99,7 +99,7 @@ class SurahRepository(SurahRepositoryProtocol):
                 surah_id = surah_key.split("_")[-1]
                 results.append(SurahInfo(
                     index=surah_id,
-                    code="",
+                    reciter_id=0,
                     mtype=1,
                     reciters_db={}
                 ))

@@ -35,72 +35,77 @@ class RandomizerService:
         self.logger = get_logger("ratteil.services.randomizer")
 
     @staticmethod
-    def get_available_reciters_list(reciters_codes_db: List[str], reciters_db: dict) -> List[str]:
+    def get_available_reciters_list(reciters_ids_db: List[int | str], reciters_db: dict) -> List[str]:
         """
         Get formatted list of available reciters.
         
         Args:
-            reciters_codes_db: List of reciter codes
+            reciters_ids_db: List of reciter IDs
             reciters_db: Reciters database
             
         Returns:
             List of formatted strings describing each reciter
         """
+        from ratteil.reciters import reciters_by_id
         reciters_list = []
-        for code in reciters_codes_db:
-            reciter = Reciter(code, reciters_db)
+        for reciter_id in reciters_ids_db:
+            code = reciters_by_id.get(reciter_id, str(reciter_id))
+            reciter = Reciter(reciter_id, reciters_db)
             reciters_list.append(f"code: {reciter.code}\tname: {reciter.name}")
         return reciters_list
         
     @staticmethod
-    def get_reciters_with_multi_moshafs(reciters_codes_db: List[str], reciters_db: dict) -> List[str]:
+    def get_reciters_with_multi_moshafs(reciters_ids_db: List[int | str], reciters_db: dict) -> List[int | str]:
         """
         Get list of reciters with multiple moshafs.
         
         Args:
-            reciters_codes_db: List of reciter codes
+            reciters_ids_db: List of reciter IDs
             reciters_db: Reciters database
             
         Returns:
-            List of reciter codes that have multiple moshafs
+            List of reciter IDs that have multiple moshafs
         """
+        from ratteil.reciters import reciters_by_id
         multi_reciters = []
-        for code in reciters_codes_db:
-            reciter = Reciter(code, reciters_db)
+        for reciter_id in reciters_ids_db:
+            code = reciters_by_id.get(reciter_id, str(reciter_id))
+            reciter = Reciter(reciter_id, reciters_db)
             if reciter.have_multi_moshafs:
-                multi_reciters.append(code)
+                multi_reciters.append(reciter_id)
         return multi_reciters
     
     @staticmethod
     def generate_random_reciters_list(
         list_length: int,
-        reciters_codes_list: List[str],
+        reciters_ids_list: List[int | str],
         reciters_db: dict
-    ) -> Tuple[List[str], List[str]]:
+    ) -> Tuple[List[int | str], List[str]]:
         """
         Generate random list of reciters and their surahs.
         
         Args:
             list_length: Number of reciters to select
-            reciters_codes_list: List of available reciter codes
+            reciters_ids_list: List of available reciter IDs
             reciters_db: Reciters database
             
         Returns:
-            Tuple of (selected_reciter_codes, selected_surahs_list)
+            Tuple of (selected_reciter_ids, selected_surahs_list)
         """
+        from ratteil.reciters import reciters_by_id
         temp_list = []
-        if list_length > len(reciters_codes_list):
-            if len(reciters_codes_list) == 1:
+        if list_length > len(reciters_ids_list):
+            if len(reciters_ids_list) == 1:
                 list_length = 1
-            elif len(reciters_codes_list) < 10:
-                list_length = r.randrange(1, len(reciters_codes_list) + 1)
+            elif len(reciters_ids_list) < 10:
+                list_length = r.randrange(1, len(reciters_ids_list) + 1)
             else:
                 list_length = r.randrange(3, 6)
                 
         while len(temp_list) != list_length:
-            reciter_code = r.choice(reciters_codes_list)
-            if reciter_code not in temp_list:
-                temp_list.append(reciter_code)
+            reciter_id = r.choice(reciters_ids_list)
+            if reciter_id not in temp_list:
+                temp_list.append(reciter_id)
                 
         selected_surahs_list = []
         for x in temp_list:

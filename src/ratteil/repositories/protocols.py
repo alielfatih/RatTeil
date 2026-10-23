@@ -18,13 +18,13 @@ class SurahRepositoryProtocol(Protocol):
     """Protocol for Surah repository."""
     
     @abstractmethod
-    def get_surah(self, surah_id: int | str, reciter_code: str, moshaf_type: int | str) -> SurahInfo:
-        """Get a single surah by ID, reciter code, and moshaf type."""
+    def get_surah(self, surah_id: int | str, reciter_id: int | str, moshaf_type: int | str) -> SurahInfo:
+        """Get a single surah by ID, reciter ID, and moshaf type."""
         ...
     
     @abstractmethod
-    def get_surahs(self, surah_ids: List[int | str], reciter_code: str, moshaf_type: int | str) -> List[SurahInfo]:
-        """Get multiple surahs by IDs, reciter code, and moshaf type."""
+    def get_surahs(self, surah_ids: List[int | str], reciter_id: int | str, moshaf_type: int | str) -> List[SurahInfo]:
+        """Get multiple surahs by IDs, reciter ID, and moshaf type."""
         ...
     
     @abstractmethod
@@ -48,13 +48,13 @@ class ReciterRepositoryProtocol(Protocol):
     """Protocol for Reciter repository."""
     
     @abstractmethod
-    def get_reciter(self, code: str) -> Reciter:
-        """Get a single reciter by code."""
+    def get_reciter(self, reciter_id: int | str) -> Reciter:
+        """Get a single reciter by ID."""
         ...
     
     @abstractmethod
-    def get_reciters(self, codes: List[str]) -> List[Reciter]:
-        """Get multiple reciters by codes."""
+    def get_reciters(self, reciter_ids: List[int | str]) -> List[Reciter]:
+        """Get multiple reciters by IDs."""
         ...
     
     @abstractmethod
@@ -63,7 +63,7 @@ class ReciterRepositoryProtocol(Protocol):
         ...
     
     @abstractmethod
-    def get_reciters_with_multi_moshafs(self) -> List[str]:
+    def get_reciters_with_multi_moshafs(self) -> List[int | str]:
         """Get list of reciters with multiple moshafs."""
         ...
     

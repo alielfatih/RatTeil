@@ -9,12 +9,12 @@ import random as r
 from typing import List
 
 
-def create_parser(reciters_codes: List[str]) -> argparse.ArgumentParser:
+def create_parser(reciters_ids: List[int | str]) -> argparse.ArgumentParser:
     """
     Create the argument parser for RatTeil CLI.
     
     Args:
-        reciters_codes: List of available reciter codes
+        reciters_ids: List of available reciter IDs
         
     Returns:
         Configured ArgumentParser instance
@@ -85,10 +85,11 @@ def create_parser(reciters_codes: List[str]) -> argparse.ArgumentParser:
     parser.add_argument(
         "-R", "--reciter",
         metavar="",
-        help="Choose reciter or reciters by code",
+        help="Choose reciter or reciters by ID",
         dest="reciter",
         nargs="*",
-        choices=reciters_codes
+        type=int,
+        choices=reciters_ids
     )
     parser.add_argument(
         "-r", "--resume",

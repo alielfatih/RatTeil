@@ -13,7 +13,8 @@ class Reciter:
     Information about a Quran reciter.
     
     Attributes:
-        code: The reciter code
+        reciter_id: The reciter ID (primary identifier)
+        code: The reciter code (for backward compatibility, computed from reciter_id)
         reciters_db: The reciters database (excluded from repr)
         name: The reciter name (computed)
         moshafs: List of available moshafs (computed)
@@ -23,7 +24,8 @@ class Reciter:
         selected_moshaf_surahs_list: List of surahs in the selected moshaf (computed)
         selected_moshaf_url: The URL of the selected moshaf (computed)
     """
-    code: str
+    reciter_id: int | str
+    code: str = field(init=False)
     reciters_db: Dict = field(repr=False)
     name: str = field(init=False)
     moshafs: List = field(init=False)
@@ -35,6 +37,14 @@ class Reciter:
 
     def __post_init__(self):
         """Initialize computed fields."""
+        from ratteil.reciters import reciters_by_id
+        
+        # Get code from reciter_id for backward compatibility
+        if isinstance(self.reciter_id, int):
+            self.code = reciters_by_id.get(self.reciter_id, str(self.reciter_id))
+        else:
+            self.code = reciters_by_id.get(int(self.reciter_id), str(self.reciter_id))
+        
         reciter_data = self.reciters_db.get(self.code, {})
         self.name = reciter_data.get("name", "")
         self.moshafs = reciter_data.get("moshaf", [])
