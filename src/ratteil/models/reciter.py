@@ -7,7 +7,7 @@ from typing import Dict, Any, List, Optional
 import random as r
 
 
-@dataclass(frozen=True)
+@dataclass
 class Reciter:
     """
     Information about a Quran reciter.

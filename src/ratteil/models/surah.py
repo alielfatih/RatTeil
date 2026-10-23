@@ -9,7 +9,7 @@ from pathlib import Path
 from ratteil.utils.file_utils import surah_index_to_filename
 
 
-@dataclass(frozen=True)
+@dataclass
 class SurahInfo:
     """
     Information about a Quran surah.
