@@ -5,6 +5,7 @@ This module provides the main entry point and subcommand handling.
 """
 
 import argparse
+import os
 import sys
 from pathlib import Path
 from typing import Optional
@@ -811,6 +812,7 @@ def handle_config_command(args: argparse.Namespace) -> int:
     Returns:
         Exit code
     """
+    import os
     from ratteil.config.settings import get_settings, reload_settings
     
     try:
@@ -909,9 +911,36 @@ def handle_config_command(args: argparse.Namespace) -> int:
                 print("Use 'online' for API fetching or 'offline' for cached data")
                 
             else:
-                # For now, just show what would be set
-                print(f"Would set {args.key} = {args.value}")
-                print("Note: Use environment variables or .env file to configure most settings")
+                # Set any configuration key
+                env_path = Path.home() / ".ratteil" / ".env"
+                env_path.parent.mkdir(parents=True, exist_ok=True)
+                
+                # Update or add the configuration key
+                env_lines = []
+                found = False
+                if env_path.exists():
+                    with open(env_path, "r", encoding="utf-8") as f:
+                        env_lines = f.readlines()
+                
+                with open(env_path, "w", encoding="utf-8") as f:
+                    for line in env_lines:
+                        if line.startswith(f"RATTEIL_{args.key.upper()}="):
+                            f.write(f"RATTEIL_{args.key.upper()}={args.value}\n")
+                            found = True
+                        else:
+                            f.write(line)
+                    if not found:
+                        f.write(f"RATTEIL_{args.key.upper()}={args.value}\n")
+                
+                # Also set environment variable for current session
+                os.environ[f"RATTEIL_{args.key.upper()}"] = args.value
+                
+                # Reload settings
+                reload_settings()
+                
+                print(f"Configuration set: {args.key} = {args.value}")
+                print(f"Saved to: {env_path}")
+                print("This will be used for new RatTeil sessions.")
         
         return 0
     except Exception as e:
