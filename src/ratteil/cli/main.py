@@ -519,33 +519,30 @@ def handle_list_command(args: argparse.Namespace) -> int:
         )
         
         if args.resource in ["reciters", "all"]:
-            print("\nAvailable Reciters (API):")
             reciters = data_manager.get_reciters()
             for reciter in reciters:
-                print(f"  code: {reciter.code}\tname: {reciter.name}")
+                print(f"code: {reciter.code}\tname: {reciter.name}")
         
         if args.resource in ["surahs", "all"]:
-            print("\nAvailable Surahs (API):")
             surahs = data_manager.get_surahs()
             for surah in surahs:
-                print(f"  {surah.id:3d}. {surah.name}")
+                print(f"{surah.id:3d}. {surah.name}")
         
         if args.resource == "languages":
-            print("\nAvailable Languages (API):")
             languages = data_manager.get_languages()
             for lang in languages:
-                print(f"  {lang.code}: {lang.name} ({lang.native_name})")
+                print(f"{lang.code}: {lang.name} ({lang.native_name})")
         
         return 0
     except Exception as e:
-        logger.warning(f"API method failed: {e}")
+        logger.debug(f"API method failed: {e}")
         # Fallback to old method if API fails
         try:
             from ratteil.cli.commands import handle_reciters_list
             from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
             
             if args.resource in ["reciters", "all"]:
-                print("\nAvailable Reciters (Static):")
+                print("\nAvailable Reciters:")
                 handle_reciters_list(
                     recitersDB,
                     recitersCodesDB,
@@ -556,7 +553,7 @@ def handle_list_command(args: argparse.Namespace) -> int:
             
             if args.resource in ["surahs", "all"]:
                 from ratteil.surahs import surah_list
-                print("\nAvailable Surahs (Static):")
+                print("\nAvailable Surahs:")
                 for i in range(1, 115):
                     surah_key = f"surah_{i}"
                     surah_name = surah_list.get(surah_key, {}).get("name", f"Surah {i}")

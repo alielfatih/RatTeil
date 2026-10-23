@@ -172,7 +172,14 @@ def handle_reciters_list(
     )
     reciters_list.sort()
     for reciter in reciters_list:
-        print(reciter)
+        # Parse the formatted string "code: X\tname: Y" and reformat
+        parts = reciter.split('\t')
+        if len(parts) == 2:
+            code_part = parts[0].split(': ', 1)[1] if ': ' in parts[0] else parts[0]
+            name_part = parts[1].split(': ', 1)[1] if ': ' in parts[1] else parts[1]
+            print(f"code: {code_part}\tname: {name_part}")
+        else:
+            print(reciter)
 
 
 def handle_copyright(ratteil_path: Path) -> None:
