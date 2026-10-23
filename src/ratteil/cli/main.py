@@ -748,16 +748,9 @@ def main():
     if args.command in handlers:
         return handlers[args.command](args)
     
-    # Default behavior (backward compatibility)
-    if args.command is None:
-        # Run in legacy mode
-        from ratteil import ratteil
-        ratteil()
-        return 0
-    
-    # Unknown command
+    # No command or unknown command - show help
     parser.print_help()
-    return 1
+    return 0
 
 
 if __name__ == "__main__":
