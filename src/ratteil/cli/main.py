@@ -6,6 +6,7 @@ This module provides the main entry point and subcommand handling.
 
 import argparse
 import sys
+from pathlib import Path
 from typing import Optional
 
 from ratteil.config.settings import get_settings
