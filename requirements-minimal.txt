@@ -1,0 +1,19 @@
+# RatTeil - Minimal Requirements
+# Only the essential dependencies for running the application
+
+# Google API clients for YouTube
+google-api-python-client>=1.7.2
+google-auth>=1.8.0
+google-auth-httplib2>=0.0.3
+google-auth-oauthlib>=0.4.1
+oauth2client>=4.0.0
+
+# HTTP client for async operations
+aiohttp>=3.8.0
+
+# Configuration management
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# Type hints support
+typing-extensions>=4.0.0

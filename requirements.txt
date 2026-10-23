@@ -1,0 +1,44 @@
+# RatTeil - Quran Recitation Streaming Tool
+# Core dependencies for production
+
+# Google API clients for YouTube
+google-api-python-client>=1.7.2,<3.0.0
+google-auth>=1.8.0,<3.0.0
+google-auth-httplib2>=0.0.3,<1.0.0
+google-auth-oauthlib>=0.4.1,<2.0.0
+oauth2client>=4.0.0,<5.0.0
+
+# HTTP client for async operations
+aiohttp>=3.8.0,<4.0.0
+
+# Configuration management
+pydantic>=2.0.0,<3.0.0
+pydantic-settings>=2.0.0,<3.0.0
+
+# Type hints support
+typing-extensions>=4.0.0,<5.0.0
+
+# Standard library dependencies (explicitly listed for clarity)
+# These are part of Python standard library but listed for documentation
+# - argparse
+# - asyncio
+# - dataclasses
+# - datetime
+# - functools
+# - glob
+# - json
+# - logging
+# - os
+# - pathlib
+# - platform
+# - random
+# - subprocess
+# - sys
+# - tempfile
+# - time
+# - typing
+# - unittest.mock
+# - webbrowser
+
+# FFmpeg is required but installed separately as a system package
+# See README.md for installation instructions
