@@ -80,6 +80,10 @@ class Settings(BaseSettings):
     log_level: str = Field(default="INFO")
     log_file: Optional[Path] = Field(default=None)
     
+    # Data Configuration
+    data_language: str = Field(default="ar")
+    data_offline: bool = Field(default=False)
+    
     # Randomization Configuration
     default_reciters_count: int = Field(default=5, ge=1, le=20)
     default_surahs_count: int = Field(default=30, ge=1, le=114)
@@ -109,6 +113,13 @@ class Settings(BaseSettings):
                 missing_field="log_level"
             )
         return v.upper()
+    
+    @field_validator("data_language")
+    @classmethod
+    def validate_language(cls, v: str) -> str:
+        """Validate data language."""
+        # Allow any language code (will be validated by API)
+        return v.lower()
     
     @field_validator("data_dir", "audio_dir", "img_dir", "fixer_dir", "fb_stream_dir")
     @classmethod
@@ -178,6 +189,8 @@ class Settings(BaseSettings):
             "log_file": str(self.log_file) if self.log_file else None,
             "default_reciters_count": self.default_reciters_count,
             "default_surahs_count": self.default_surahs_count,
+            "data_language": self.data_language,
+            "data_offline": self.data_offline,
             "has_youtube_credentials": self.has_youtube_credentials(),
             "has_facebook_credentials": self.has_facebook_credentials(),
         }

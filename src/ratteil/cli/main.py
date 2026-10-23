@@ -692,9 +692,81 @@ def handle_config_command(args: argparse.Namespace) -> int:
             if not args.key or not args.value:
                 print("Please specify both key and value")
                 return 1
-            # For now, just show what would be set
-            print(f"Would set {args.key} = {args.value}")
-            print("Note: Use environment variables or .env file to configure settings")
+            
+            # Handle special config keys
+            if args.key == "language":
+                # Set data language
+                from ratteil.data.data_manager import QuranDataManager
+                import os
+                
+                # Save to .env file
+                env_path = Path.home() / ".ratteil" / ".env"
+                env_path.parent.mkdir(parents=True, exist_ok=True)
+                
+                # Update or add RATTEIL_LANGUAGE
+                env_lines = []
+                found = False
+                if env_path.exists():
+                    with open(env_path, "r", encoding="utf-8") as f:
+                        env_lines = f.readlines()
+                
+                with open(env_path, "w", encoding="utf-8") as f:
+                    for line in env_lines:
+                        if line.startswith("RATTEIL_LANGUAGE="):
+                            f.write(f"RATTEIL_LANGUAGE={args.value}\n")
+                            found = True
+                        else:
+                            f.write(line)
+                    if not found:
+                        f.write(f"RATTEIL_LANGUAGE={args.value}\n")
+                
+                # Also set environment variable for current session
+                os.environ["RATTEIL_LANGUAGE"] = args.value
+                
+                # Reload settings
+                from ratteil.config.settings import reload_settings
+                reload_settings()
+                
+                print(f"Language set to: {args.value}")
+                print("This will be used for new data fetching sessions.")
+                print("To apply immediately, restart RatTeil or use 'ratteil data refresh'")
+                
+            elif args.key == "data_mode":
+                # Set offline/online mode
+                from ratteil.data.data_manager import QuranDataManager
+                import os
+                
+                # Save to .env file
+                env_path = Path.home() / ".ratteil" / ".env"
+                env_path.parent.mkdir(parents=True, exist_ok=True)
+                
+                # Update or add RATTEIL_DATA_MODE
+                env_lines = []
+                found = False
+                if env_path.exists():
+                    with open(env_path, "r", encoding="utf-8") as f:
+                        env_lines = f.readlines()
+                
+                with open(env_path, "w", encoding="utf-8") as f:
+                    for line in env_lines:
+                        if line.startswith("RATTEIL_DATA_MODE="):
+                            f.write(f"RATTEIL_DATA_MODE={args.value}\n")
+                            found = True
+                        else:
+                            f.write(line)
+                    if not found:
+                        f.write(f"RATTEIL_DATA_MODE={args.value}\n")
+                
+                # Also set environment variable for current session
+                os.environ["RATTEIL_DATA_MODE"] = args.value
+                
+                print(f"Data mode set to: {args.value}")
+                print("Use 'online' for API fetching or 'offline' for cached data")
+                
+            else:
+                # For now, just show what would be set
+                print(f"Would set {args.key} = {args.value}")
+                print("Note: Use environment variables or .env file to configure most settings")
         
         return 0
     except Exception as e:
