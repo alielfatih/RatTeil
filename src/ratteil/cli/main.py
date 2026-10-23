@@ -76,7 +76,7 @@ Examples:
         required=True
     )
     stream_parser.add_argument(
-        "-r", "--reciter",
+        "-R", "--reciter",
         metavar="CODE",
         help="Reciter code(s) to use (e.g., alafasy, husary)",
         dest="reciter",
@@ -145,7 +145,7 @@ Examples:
         description="Download Quran audio from various reciters"
     )
     download_parser.add_argument(
-        "-r", "--reciter",
+        "-R", "--reciter",
         metavar="CODE",
         help="Reciter code(s) to download from (e.g., alafasy, husary)",
         dest="reciter",
@@ -230,7 +230,7 @@ Examples:
         description="Prepare audio files for streaming without actually streaming"
     )
     prepare_parser.add_argument(
-        "-r", "--reciter",
+        "-R", "--reciter",
         metavar="CODE",
         help="Reciter code(s) to use (e.g., alafasy, husary)",
         dest="reciter",
@@ -265,7 +265,7 @@ Examples:
         description="Validate stream configuration and audio files"
     )
     validate_parser.add_argument(
-        "-r", "--reciter",
+        "-R", "--reciter",
         metavar="CODE",
         help="Reciter code(s) to validate",
         dest="reciter",
