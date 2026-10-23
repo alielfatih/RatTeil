@@ -133,7 +133,8 @@ def handle_reciters_list(
     reciters_db: dict,
     reciters_codes_db: List[str],
     resources_path: Path,
-    package_path: Path
+    package_path: Path,
+    use_api: bool = True
 ) -> None:
     """
     Handle the reciters list command.
@@ -143,7 +144,29 @@ def handle_reciters_list(
         reciters_codes_db: List of reciter codes
         resources_path: Resources directory
         package_path: Package directory
+        use_api: Whether to use API method (default: True)
     """
+    from ratteil.data.data_manager import QuranDataManager
+    from ratteil.config.settings import get_settings
+    
+    settings = get_settings()
+    
+    # Try API method first
+    if use_api:
+        try:
+            data_manager = QuranDataManager(
+                language=settings.data_language,
+                offline=settings.data_offline
+            )
+            reciters = data_manager.get_reciters()
+            print("\nAvailable Reciters (API):")
+            for reciter in reciters:
+                print(f"  code: {reciter.code}\tname: {reciter.name}")
+            return
+        except Exception as e:
+            logger.warning(f"API method failed, falling back to static data: {e}")
+    
+    # Fallback to old static method
     reciters_list = RandomizerService.get_available_reciters_list(
         reciters_codes_db, reciters_db
     )

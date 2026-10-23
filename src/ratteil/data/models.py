@@ -53,20 +53,17 @@ class Reciter:
     Attributes:
         id: Unique identifier
         name: Reciter name
+        code: Reciter code (e.g., alafasy, husary)
         letter: Starting letter of the name
         moshafs: List of available recordings
         language: Language code for this reciter's data
     """
     id: int
     name: str
+    code: str = ""
     letter: str = ""
     moshafs: List[Dict[str, Any]] = field(default_factory=list)
     language: str = "ar"
-    
-    @property
-    def code(self) -> str:
-        """Get the reciter code (lowercase name without spaces)."""
-        return self.name.lower().replace(" ", "")
     
     def get_moshaf_urls(self) -> List[str]:
         """Get all moshaf base URLs."""
@@ -83,6 +80,7 @@ class Reciter:
         """Convert to dictionary."""
         return {
             "id": self.id,
+            "code": self.code,
             "name": self.name,
             "letter": self.letter,
             "moshafs": self.moshafs,
@@ -94,6 +92,7 @@ class Reciter:
         """Create from dictionary."""
         return cls(
             id=data.get("id", 0),
+            code=data.get("code", ""),
             name=data.get("name", ""),
             letter=data.get("letter", data.get("name", "")[0] if data.get("name") else ""),
             moshafs=data.get("moshaf", data.get("moshafs", [])),

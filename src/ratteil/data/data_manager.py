@@ -241,6 +241,7 @@ class QuranDataManager:
                 
                 reciters.append(Reciter(
                     id=reciter_data.get("id", len(reciters) + 1),
+                    code=code,
                     name=reciter_data.get("name", code),
                     letter=reciter_data.get("letter", ""),
                     moshafs=moshafs,

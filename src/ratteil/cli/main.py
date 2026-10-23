@@ -327,7 +327,7 @@ def handle_stream_command(args: argparse.Namespace) -> int:
         Exit code
     """
     from ratteil.cli.commands import pre_launcher
-    from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
+    from ratteil.data.data_manager import QuranDataManager
     from ratteil.config.settings import get_settings
     
     settings = get_settings()
@@ -337,6 +337,34 @@ def handle_stream_command(args: argparse.Namespace) -> int:
     # Set up paths
     resources_path = settings.data_dir
     package_path = Path(__file__).resolve().parent.parent
+    
+    # Try to use API method first
+    try:
+        data_manager = QuranDataManager(
+            language=settings.data_language,
+            offline=settings.data_offline
+        )
+        
+        # Convert API reciters to old format for compatibility
+        recitersDB = {}
+        recitersCodesDB = []
+        
+        for reciter in data_manager.get_reciters():
+            code = reciter.code
+            recitersCodesDB.append(code)
+            recitersDB[code] = {
+                "id": reciter.id,
+                "name": reciter.name,
+                "letter": reciter.letter or "",
+                "moshaf": reciter.moshafs or []
+            }
+        
+        logger.debug(f"Using API data: {len(recitersCodesDB)} reciters loaded")
+        
+    except Exception as api_error:
+        logger.warning(f"API method failed, falling back to static data: {api_error}")
+        # Fallback to old static method
+        from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
     
     # Convert args to options-like object
     class Options:
@@ -379,7 +407,7 @@ def handle_download_command(args: argparse.Namespace) -> int:
     """
     from ratteil.services.download_service import DownloadService
     from ratteil.services.randomizer_service import RandomizerService
-    from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
+    from ratteil.data.data_manager import QuranDataManager
     from ratteil.config.settings import get_settings
     from pathlib import Path
     
@@ -392,6 +420,34 @@ def handle_download_command(args: argparse.Namespace) -> int:
     download_path.mkdir(parents=True, exist_ok=True)
     
     try:
+        # Try to use API method first
+        try:
+            data_manager = QuranDataManager(
+                language=settings.data_language,
+                offline=settings.data_offline
+            )
+            
+            # Convert API reciters to old format for compatibility
+            recitersDB = {}
+            recitersCodesDB = []
+            
+            for reciter in data_manager.get_reciters():
+                code = reciter.code
+                recitersCodesDB.append(code)
+                recitersDB[code] = {
+                    "id": reciter.id,
+                    "name": reciter.name,
+                    "letter": reciter.letter or "",
+                    "moshaf": reciter.moshafs or []
+                }
+            
+            logger.debug(f"Using API data: {len(recitersCodesDB)} reciters loaded")
+            
+        except Exception as api_error:
+            logger.warning(f"API method failed, falling back to static data: {api_error}")
+            # Fallback to old static method
+            from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
+        
         # Generate surahs list
         if args.all:
             # Download all surahs from selected reciters
@@ -447,8 +503,7 @@ def handle_list_command(args: argparse.Namespace) -> int:
     Returns:
         Exit code
     """
-    from ratteil.cli.commands import handle_reciters_list
-    from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
+    from ratteil.data.data_manager import QuranDataManager
     from ratteil.config.settings import get_settings
     
     settings = get_settings()
@@ -456,26 +511,60 @@ def handle_list_command(args: argparse.Namespace) -> int:
     package_path = Path(__file__).resolve().parent.parent
     
     try:
+        # Use new data manager with API support
+        data_manager = QuranDataManager(
+            language=settings.data_language,
+            offline=settings.data_offline
+        )
+        
         if args.resource in ["reciters", "all"]:
-            handle_reciters_list(
-                recitersDB,
-                recitersCodesDB,
-                resources_path,
-                package_path
-            )
+            print("\nAvailable Reciters (API):")
+            reciters = data_manager.get_reciters()
+            for reciter in reciters:
+                print(f"  code: {reciter.code}\tname: {reciter.name}")
         
         if args.resource in ["surahs", "all"]:
-            from ratteil.surahs import surah_list
-            print("\nAvailable Surahs:")
-            for i in range(1, 115):
-                surah_key = f"surah_{i}"
-                surah_name = surah_list.get(surah_key, {}).get("name", f"Surah {i}")
-                print(f"  {i:3d}. {surah_name}")
+            print("\nAvailable Surahs (API):")
+            surahs = data_manager.get_surahs()
+            for surah in surahs:
+                print(f"  {surah.id:3d}. {surah.name}")
+        
+        if args.resource == "languages":
+            print("\nAvailable Languages (API):")
+            languages = data_manager.get_languages()
+            for lang in languages:
+                print(f"  {lang.code}: {lang.name} ({lang.native_name})")
         
         return 0
     except Exception as e:
-        logger.error(f"List command failed: {e}")
-        return 1
+        logger.warning(f"API method failed: {e}")
+        # Fallback to old method if API fails
+        try:
+            from ratteil.cli.commands import handle_reciters_list
+            from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
+            
+            if args.resource in ["reciters", "all"]:
+                print("\nAvailable Reciters (Static):")
+                handle_reciters_list(
+                    recitersDB,
+                    recitersCodesDB,
+                    resources_path,
+                    package_path,
+                    use_api=False  # Use static data
+                )
+            
+            if args.resource in ["surahs", "all"]:
+                from ratteil.surahs import surah_list
+                print("\nAvailable Surahs (Static):")
+                for i in range(1, 115):
+                    surah_key = f"surah_{i}"
+                    surah_name = surah_list.get(surah_key, {}).get("name", f"Surah {i}")
+                    print(f"  {i:3d}. {surah_name}")
+            
+            return 0
+        except Exception as fallback_e:
+            logger.error(f"Fallback list command also failed: {fallback_e}")
+            return 1
 
 
 def handle_auth_command(args: argparse.Namespace) -> int:
@@ -562,7 +651,7 @@ def handle_prepare_command(args: argparse.Namespace) -> int:
     """
     from ratteil.services.stream_service import StreamService
     from ratteil.services.randomizer_service import RandomizerService
-    from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
+    from ratteil.data.data_manager import QuranDataManager
     from ratteil.config.settings import get_settings
     from pathlib import Path
     
@@ -574,6 +663,34 @@ def handle_prepare_command(args: argparse.Namespace) -> int:
     package_path = Path(__file__).resolve().parent.parent
     
     try:
+        # Try to use API method first
+        try:
+            data_manager = QuranDataManager(
+                language=settings.data_language,
+                offline=settings.data_offline
+            )
+            
+            # Convert API reciters to old format for compatibility
+            recitersDB = {}
+            recitersCodesDB = []
+            
+            for reciter in data_manager.get_reciters():
+                code = reciter.code
+                recitersCodesDB.append(code)
+                recitersDB[code] = {
+                    "id": reciter.id,
+                    "name": reciter.name,
+                    "letter": reciter.letter or "",
+                    "moshaf": reciter.moshafs or []
+                }
+            
+            logger.debug(f"Using API data: {len(recitersCodesDB)} reciters loaded")
+            
+        except Exception as api_error:
+            logger.warning(f"API method failed, falling back to static data: {api_error}")
+            # Fallback to old static method
+            from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
+        
         stream_service = StreamService(
             recitersDB,
             resources_path,
@@ -614,7 +731,7 @@ def handle_validate_command(args: argparse.Namespace) -> int:
     """
     from ratteil.utils.validation import stream_validation
     from ratteil.services.stream_service import StreamService
-    from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
+    from ratteil.data.data_manager import QuranDataManager
     from ratteil.config.settings import get_settings
     from pathlib import Path
     import glob as g
@@ -627,6 +744,34 @@ def handle_validate_command(args: argparse.Namespace) -> int:
     package_path = Path(__file__).resolve().parent.parent
     
     try:
+        # Try to use API method first
+        try:
+            data_manager = QuranDataManager(
+                language=settings.data_language,
+                offline=settings.data_offline
+            )
+            
+            # Convert API reciters to old format for compatibility
+            recitersDB = {}
+            recitersCodesDB = []
+            
+            for reciter in data_manager.get_reciters():
+                code = reciter.code
+                recitersCodesDB.append(code)
+                recitersDB[code] = {
+                    "id": reciter.id,
+                    "name": reciter.name,
+                    "letter": reciter.letter or "",
+                    "moshaf": reciter.moshafs or []
+                }
+            
+            logger.debug(f"Using API data: {len(recitersCodesDB)} reciters loaded")
+            
+        except Exception as api_error:
+            logger.warning(f"API method failed, falling back to static data: {api_error}")
+            # Fallback to old static method
+            from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recitersDB
+        
         stream_service = StreamService(
             recitersDB,
             resources_path,
