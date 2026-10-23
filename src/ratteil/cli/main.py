@@ -32,8 +32,8 @@ RatTeil streams Quran recitations to YouTube and Facebook.
 Use subcommands for specific operations or run without arguments for interactive mode.
 
 Examples:
-  ratteil stream -t youtube -R alafasy -s 1-5
-  ratteil download -R alafasy -sn 10
+  ratteil stream -p youtube -r alafasy -s 1-5
+  ratteil download -r alafasy --surahs 10
   ratteil list reciters
   ratteil auth youtube
   ratteil config show
@@ -67,18 +67,18 @@ Examples:
         description="Stream Quran recitations to YouTube or Facebook"
     )
     stream_parser.add_argument(
-        "-t", "--sites",
+        "-p", "--platform",
         metavar="PLATFORM",
-        help="Platform(s) to stream to",
+        help="Platform(s) to stream to (youtube, facebook)",
         dest="sites",
         choices=["youtube", "yt", "fb", "facebook"],
         nargs="*",
         required=True
     )
     stream_parser.add_argument(
-        "-R", "--reciter",
+        "-r", "--reciter",
         metavar="CODE",
-        help="Reciter code(s) to use",
+        help="Reciter code(s) to use (e.g., alafasy, husary)",
         dest="reciter",
         nargs="*"
     )
@@ -87,34 +87,34 @@ Examples:
         metavar="INDEX",
         type=int,
         choices=list(range(1, 115)),
-        help="Specific surah to stream"
+        help="Specific surah to stream (1-114)"
     )
     stream_parser.add_argument(
-        "-sn", "--surahs-number",
-        metavar="N",
+        "-n", "--surahs",
+        metavar="COUNT",
         type=int,
-        help="Number of surahs per stream",
+        help="Number of surahs per stream (default: 30)",
         default=30
     )
     stream_parser.add_argument(
-        "-n", "--reciters-number",
-        metavar="N",
+        "-q", "--qaris",
+        metavar="COUNT",
         type=int,
-        help="Number of reciters per stream",
+        help="Number of reciters per stream (default: 5)",
         default=5
     )
     stream_parser.add_argument(
-        "-mx", "--max-length",
+        "--max-length",
         metavar="MINUTES",
         type=float,
-        help="Maximum stream length in minutes",
+        help="Maximum stream length in minutes (default: 75.0)",
         default=75.0
     )
     stream_parser.add_argument(
-        "-m", "--min-length",
+        "--min-length",
         metavar="MINUTES",
         type=float,
-        help="Minimum stream length in minutes",
+        help="Minimum stream length in minutes (default: 120.0)",
         default=120.0
     )
     stream_parser.add_argument(
@@ -123,12 +123,12 @@ Examples:
         help="Use existing files, don't download new ones"
     )
     stream_parser.add_argument(
-        "--no-validation",
+        "--skip-validation",
         action="store_true",
         help="Skip minimum stream length validation"
     )
     stream_parser.add_argument(
-        "-T", "--title",
+        "-t", "--title",
         metavar="TITLE",
         help="Custom stream title"
     )
@@ -145,9 +145,9 @@ Examples:
         description="Download Quran audio from various reciters"
     )
     download_parser.add_argument(
-        "-R", "--reciter",
+        "-r", "--reciter",
         metavar="CODE",
-        help="Reciter code(s) to download from",
+        help="Reciter code(s) to download from (e.g., alafasy, husary)",
         dest="reciter",
         nargs="*",
         required=True
@@ -157,13 +157,13 @@ Examples:
         metavar="INDEX",
         type=int,
         choices=list(range(1, 115)),
-        help="Specific surah to download"
+        help="Specific surah to download (1-114)"
     )
     download_parser.add_argument(
-        "-sn", "--surahs-number",
-        metavar="N",
+        "-n", "--surahs",
+        metavar="COUNT",
         type=int,
-        help="Number of surahs to download",
+        help="Number of surahs to download (default: 10)",
         default=10
     )
     download_parser.add_argument(
@@ -173,7 +173,7 @@ Examples:
         default=None
     )
     download_parser.add_argument(
-        "--all",
+        "-a", "--all",
         action="store_true",
         help="Download all available surahs"
     )
@@ -230,9 +230,9 @@ Examples:
         description="Prepare audio files for streaming without actually streaming"
     )
     prepare_parser.add_argument(
-        "-R", "--reciter",
+        "-r", "--reciter",
         metavar="CODE",
-        help="Reciter code(s) to use",
+        help="Reciter code(s) to use (e.g., alafasy, husary)",
         dest="reciter",
         nargs="*"
     )
@@ -241,20 +241,20 @@ Examples:
         metavar="INDEX",
         type=int,
         choices=list(range(1, 115)),
-        help="Specific surah to prepare"
+        help="Specific surah to prepare (1-114)"
     )
     prepare_parser.add_argument(
-        "-sn", "--surahs-number",
-        metavar="N",
+        "-n", "--surahs",
+        metavar="COUNT",
         type=int,
-        help="Number of surahs to prepare",
+        help="Number of surahs to prepare (default: 30)",
         default=30
     )
     prepare_parser.add_argument(
-        "-mx", "--max-length",
+        "--max-length",
         metavar="MINUTES",
         type=float,
-        help="Maximum stream length in minutes",
+        help="Maximum stream length in minutes (default: 75.0)",
         default=75.0
     )
     
@@ -265,7 +265,7 @@ Examples:
         description="Validate stream configuration and audio files"
     )
     validate_parser.add_argument(
-        "-R", "--reciter",
+        "-r", "--reciter",
         metavar="CODE",
         help="Reciter code(s) to validate",
         dest="reciter",
@@ -275,7 +275,7 @@ Examples:
         "-m", "--min-length",
         metavar="MINUTES",
         type=float,
-        help="Minimum stream length to validate",
+        help="Minimum stream length to validate (default: 120.0)",
         default=120.0
     )
     
@@ -345,12 +345,12 @@ def handle_stream_command(args: argparse.Namespace) -> int:
     options.sites = args.sites or []
     options.reciter = args.reciter or []
     options.surah = args.surah
-    options.surahs_number = args.surahs_number
-    options.reciters_number = args.reciters_number
+    options.surahs_number = args.surahs
+    options.reciters_number = args.qaris
     options.max_len = args.max_length
     options.minimum_stream_length = args.min_length
     options.no_download = args.no_download
-    options.no_validation = args.no_validation
+    options.no_validation = args.skip_validation
     options.dev = args.dev
     
     try:
@@ -419,7 +419,7 @@ def handle_download_command(args: argparse.Namespace) -> int:
                 1, args.reciter, recitersDB
             )
             stream_surahs_list = RandomizerService.generate_random_surahs_list(
-                args.surahs_number, args.surah, selected_surahs_list
+                args.surahs, args.surah, selected_surahs_list
             )
             
             download_service = DownloadService()
@@ -584,10 +584,10 @@ def handle_prepare_command(args: argparse.Namespace) -> int:
         temp_reciters_list = args.reciter or recitersCodesDB
         
         _, selected_surahs_list = RandomizerService.generate_random_reciters_list(
-            args.reciters_number or 5, temp_reciters_list, recitersDB
+            args.qaris or 5, temp_reciters_list, recitersDB
         )
         stream_surahs_list = RandomizerService.generate_random_surahs_list(
-            args.surahs_number, args.surah, selected_surahs_list
+            args.surahs, args.surah, selected_surahs_list
         )
         
         # Prepare stream files
