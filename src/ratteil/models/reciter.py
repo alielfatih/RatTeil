@@ -1,19 +1,40 @@
+"""
+Reciter model for RatTeil application.
+"""
+
 from dataclasses import dataclass, field
+from typing import Dict, Any, List, Optional
 import random as r
 
-@dataclass
+
+@dataclass(frozen=True)
 class Reciter:
+    """
+    Information about a Quran reciter.
+    
+    Attributes:
+        code: The reciter code
+        reciters_db: The reciters database (excluded from repr)
+        name: The reciter name (computed)
+        moshafs: List of available moshafs (computed)
+        have_multi_moshafs: Whether the reciter has multiple moshafs (computed)
+        select_moshaf: The selected moshaf (computed)
+        selected_moshaf_type: The selected moshaf type (computed)
+        selected_moshaf_surahs_list: List of surahs in the selected moshaf (computed)
+        selected_moshaf_url: The URL of the selected moshaf (computed)
+    """
     code: str
-    reciters_db: dict = field(repr=False)
+    reciters_db: Dict = field(repr=False)
     name: str = field(init=False)
-    moshafs: list = field(init=False)
+    moshafs: List = field(init=False)
     have_multi_moshafs: bool = field(init=False)
-    select_moshaf: dict = field(init=False)
+    select_moshaf: Dict = field(init=False)
     selected_moshaf_type: int = field(init=False)
-    selected_moshaf_surahs_list: list = field(init=False)
+    selected_moshaf_surahs_list: List = field(init=False)
     selected_moshaf_url: str = field(init=False)
 
     def __post_init__(self):
+        """Initialize computed fields."""
         reciter_data = self.reciters_db.get(self.code, {})
         self.name = reciter_data.get("name", "")
         self.moshafs = reciter_data.get("moshaf", [])
@@ -32,7 +53,17 @@ class Reciter:
             self.selected_moshaf_url = ""
 
     def get_moshaf_name_url(self, mtype: int, url: bool = False) -> str:
+        """
+        Get moshaf name or URL by type.
+        
+        Args:
+            mtype: The moshaf type
+            url: If True, return URL; otherwise return name
+            
+        Returns:
+            The moshaf name or URL
+        """
         for x in self.moshafs:
             if x.get("moshaf_type") == mtype:
                 return x.get("server") if url else x.get("name")
-        return "" 
+        return ""

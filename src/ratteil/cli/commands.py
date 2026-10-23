@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 from ratteil.services.stream_service import StreamService
 from ratteil.services.randomizer_service import RandomizerService
-from ratteil.services.download_service import download_audios
+from ratteil.services.download_service import DownloadService
 from ratteil.utils.validation import stream_validation
 
 def pre_launcher(options, reciters_db, reciters_codes_db, resources_path, package_path) -> None:
@@ -26,7 +26,7 @@ def pre_launcher(options, reciters_db, reciters_codes_db, resources_path, packag
             options.surahs_number, surah_index, selected_surahs_list
         )
         
-        previous_len, max_st = download_audios(
+        previous_len, max_st = DownloadService().download_audios(
             stream_service, options.max_len, stream_surahs_list, reciters_db, resources_path
         )
         
