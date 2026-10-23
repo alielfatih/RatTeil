@@ -69,12 +69,21 @@ def pre_launcher(
             options.surahs_number, surah_index, selected_surahs_list
         )
         
-        previous_len, max_st = download_service.download_audios(
-            settings.max_stream_length,
-            stream_surahs_list,
-            reciters_db,
-            resources_path
-        )
+        # Run async download_audios synchronously
+        import asyncio
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            previous_len, max_st = loop.run_until_complete(
+                download_service.download_audios(
+                    settings.max_stream_length,
+                    stream_surahs_list,
+                    reciters_db,
+                    resources_path
+                )
+            )
+        finally:
+            loop.close()
         
         if not options.no_validation:
             minimum_stream_length = 0
