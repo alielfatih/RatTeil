@@ -23,7 +23,7 @@ class QuranAPIClient:
     - GET https://mp3quran.net/api/v3/suwar?language={lang} - Get surahs
     """
     
-    BASE_URL = "https://mp3quran.net/api/v3"
+    BASE_URL = "https://www.mp3quran.net/api/v3"
     
     # Default languages that are known to work
     SUPPORTED_LANGUAGES = ["ar", "en", "fr", "de", "es", "tr", "ur", "fa", "ru"]
@@ -100,14 +100,15 @@ class QuranAPIClient:
         """
         try:
             data = await self._get("languages")
-            languages_data = data.get("languages", [])
+            # API returns "language" (singular) not "languages" (plural)
+            languages_data = data.get("language", [])
             
             languages = []
             for lang_data in languages_data:
                 languages.append(Language(
-                    code=lang_data.get("code", ""),
-                    name=lang_data.get("name", ""),
-                    native_name=lang_data.get("native_name", ""),
+                    code=lang_data.get("locale", lang_data.get("code", "")),
+                    name=lang_data.get("language", lang_data.get("name", "")),
+                    native_name=lang_data.get("native", lang_data.get("native_name", "")),
                     rtl=lang_data.get("rtl", False)
                 ))
             
@@ -141,15 +142,48 @@ class QuranAPIClient:
             data = await self._get("reciters", params={"language": language})
             reciters_data = data.get("reciters", [])
             
+            # Build a mapping from API IDs to codes from static data
+            # This ensures compatibility with existing code that uses codes like 'akdr', 'husary', etc.
+            code_mapping = self._build_reciter_code_mapping()
+            
             reciters = []
             for reciter_data in reciters_data:
-                reciter = Reciter.from_dict(reciter_data, language)
+                reciter_id = reciter_data.get("id", 0)
+                # Use code from mapping if available, otherwise use the ID
+                code = code_mapping.get(reciter_id, str(reciter_id))
+                
+                reciter = Reciter(
+                    id=reciter_id,
+                    code=code,
+                    name=reciter_data.get("name", ""),
+                    letter=reciter_data.get("letter", ""),
+                    moshafs=reciter_data.get("moshaf", []),
+                    language=language
+                )
                 reciters.append(reciter)
             
             return reciters
         except APIError:
             self.logger.warning(f"Failed to fetch reciters for language {language}")
             return []
+    
+    def _build_reciter_code_mapping(self) -> Dict[int, str]:
+        """
+        Build a mapping from API reciter IDs to codes used in static data.
+        
+        Returns:
+            Dictionary mapping API IDs to codes
+        """
+        try:
+            from ratteil.reciters import reciters as static_reciters
+            mapping = {}
+            for code, data in static_reciters.items():
+                reciter_id = data.get("id", 0)
+                if reciter_id:
+                    mapping[reciter_id] = code
+            return mapping
+        except Exception:
+            return {}
     
     async def get_surahs(self, language: str = "ar") -> List[Surah]:
         """
