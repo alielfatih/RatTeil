@@ -38,6 +38,31 @@ def ratteil():
     """Main entry point for RatTeil application."""
     ensure_resources_initialized(RATTEIL_RESOURCES, RATTEIL_PATH)
     
+    # Initialize data from API
+    from ratteil.data.data_manager import QuranDataManager
+    settings = get_settings()
+    data_manager = QuranDataManager(language=settings.data_language, offline=settings.data_offline)
+    
+    # Convert API data to old format for compatibility
+    recitersDB = {}
+    recitersIdsDB = []
+    
+    try:
+        for reciter in data_manager.get_reciters():
+            code = reciter.code
+            recitersIdsDB.append(code)
+            recitersDB[code] = {
+                "id": reciter.id,
+                "name": reciter.name,
+                "letter": reciter.letter or "",
+                "moshaf": reciter.moshafs or []
+            }
+    except Exception as e:
+        print(f"Failed to load reciters data: {e}")
+        # Fallback to empty data
+        recitersIdsDB = []
+        recitersDB = {}
+    
     parser = create_parser(recitersIdsDB)
     args = parser.parse_args()
     

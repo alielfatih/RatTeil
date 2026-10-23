@@ -174,7 +174,53 @@ class QuranAPIClient:
         Returns:
             Dictionary mapping API IDs to codes
         """
-        return {}
+        return {
+            1: 'akdr', 2: 'jbreen', 3: '3siri', 4: 'shatri', 5: 'ajm',
+            6: 'hawashi', 7: 'saud', 8: 'saber', 9: 'ahmad_nu', 10: 'akrm',
+            11: '3zazi', 12: 'abkr', 13: 'alzain', 14: 'qari', 15: 'omran',
+            16: 'koshi', 17: 'twfeeq', 18: 'jamal', 19: 'hamad', 20: 'jleel',
+            21: 'qht', 22: 'kafi', 23: 'whabi', 24: 'tnjy', 25: 'hamza',
+            26: 'ifrad', 27: 'bl3', 28: 'zakariya', 29: 's_gmd', 30: 'shur',
+            31: 'shl', 32: 'zaki', 33: 'sami_hsn', 34: 'sami_dosr', 35: 'sayed',
+            36: 'shaban', 37: 'taher', 38: 'hkm', 39: 'sahood', 40: 'tlb',
+            41: 'habdan', 42: 's_bud', 43: 'salah_hashim_m', 44: 'bu_khtr', 45: 'ryan',
+            46: 'thubti', 47: 'bari', 48: 'basit', 49: 'sds', 50: 'a_ahmed',
+            51: 'zahrani', 52: 'brmi', 53: 'buajan', 54: 'mtrod', 55: 'bsfr',
+            56: 'kyat', 57: 'jhn', 58: 'gulan', 59: 'soufi', 60: 'mohsin_harthi',
+            61: 'qasm', 62: 'askr', 63: 'obk', 64: 'kanakeri', 65: 'wdod',
+            66: 'arkani', 67: 'abo_hashim', 68: 'hthfi', 70: 'a_jbr', 71: 'hajjaj',
+            72: 'hafz', 73: 'omar_warsh', 74: 'frs_a', 75: 'fahad_otibi',
+            76: 'kndri', 77: 'fawaz', 78: 'lafi', 79: 'qtm', 80: 'nabil',
+            81: 'namh', 82: 'hani', 83: 'dlami', 84: 'waleed', 85: 'yasser',
+            86: 'qurashi', 87: 'fyl', 88: 'mzroyee', 89: 'yahya', 90: 'yousef',
+            91: 'majd_onazi', 92: 'shaibat', 93: 'maher', 94: 'earawi', 95: 'braak',
+            96: 'tblawi', 97: 'lhdan', 98: 'mhsny', 99: 'ayyoub2', 100: 'shah',
+            101: 'jbrl', 102: 'minsh', 103: 'm_krm', 104: 'abdullah', 105: 'husr',
+            106: 'bna', 107: 'afs', 108: 'mustafa', 109: 'lahoni', 110: 'ra3ad',
+            111: 'muamr', 113: 'zaml', 114: 'shaksh', 115: 'monshed', 116: 'sheimy',
+            117: 'salamah', 120: 'mohna', 121: 'a_klb', 122: 'bilal', 123: 'alshaik',
+            124: 'hatem', 125: 'jormy', 126: 'mrifai', 127: 'obaid', 128: 'wasel',
+            129: 'ibrahim_dosri', 130: 'jaman', 139: 'malaysia', 140: 'noah',
+            141: 'zilaie', 142: 'harthi', 143: 'rashad', 145: 'trablsi',
+            149: 'ahmad_huth', 150: 'khan', 151: 'dgsh', 152: 'dokali', 153: 'wishear',
+            154: 'fateh', 155: 'tareq', 157: 'balilah', 158: 'shoraimy', 159: 'wdee3',
+            160: 'kurdi', 162: 'aloosi', 163: 'ghamdi', 164: 'shakoor', 165: 'm_arkani',
+            166: 'm_qari', 167: 'rami', 168: 'hazza', 169: 'a_majed', 170: 'salman',
+            171: 'refat', 172: 'mousa', 173: 'khalf', 174: 'mansor', 175: 'musali',
+            176: 'sharekh', 177: 'alosfor', 181: 'swlim', 182: 'islam',
+            184: 'bader', 186: 'hitham', 187: 'nasser_almajed', 188: 'shaheen',
+            189: 'bukheet', 190: 'saad', 191: 'nufais', 192: 'darweez',
+            197: 'abdulazizasiri', 198: 'souilass', 199: 'deban', 200: 'kamel',
+            201: 'peshawa', 206: 'okasha', 208: 'h_dukhain', 221: 'sneineh',
+            222: 'qeniwa', 223: 'm_abdelhakam', 227: 'm_sayed', 228: 'a_swaiyd',
+            229: 'a_binaoun', 230: 'a_binhameed', 231: 'nourin_siddig',
+            232: 'a_bukhari', 233: 'a_turki', 234: 'mukhtar_haj', 235: 'a_abdl',
+            236: 'm_akri', 237: 'a_maasaraawi', 238: 'i_kshidan', 239: 'h_abudalal',
+            240: 'f_khamery', 241: 's_hashemi', 242: 'kh_mohammadi', 243: 'shamrani',
+            245: 's_sadeiq', 246: 'h_saleh', 247: 'a_alshahhat', 248: 'i_sanankoua',
+            249: 'h_baqai', 250: 's_alquraishi', 251: 'f_hajry', 252: 'a_alemadi',
+            253: 'a_alaskar', 285: 'a_alhazmi', 301: 'a_sheim'
+        }
     
     async def get_surahs(self, language: str = "ar") -> List[Surah]:
         """
