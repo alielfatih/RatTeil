@@ -12,6 +12,7 @@ from ratteil.reciters import reciters_code as recitersCodesDB, reciters as recit
 import sys
 import os
 
+# Initialize paths
 RATTEIL_PATH = Path(__file__).resolve().parent
 RATTEIL_RESOURCES = get_settings().data_dir
 
@@ -35,6 +36,7 @@ def ensure_resources_initialized(resources_path: Path, package_path: Path) -> No
             shutil.copytree(imgs_src, resources_path / "imgs", dirs_exist_ok=True)
 
 def ratteil():
+    """Main entry point for RatTeil application."""
     ensure_resources_initialized(RATTEIL_RESOURCES, RATTEIL_PATH)
     
     parser = create_parser(recitersCodesDB)
@@ -56,3 +58,7 @@ def ratteil():
         handle_copyright(RATTEIL_PATH)
     else:
         pre_launcher(args, active_reciters_db, recitersCodesDB, RATTEIL_RESOURCES, RATTEIL_PATH)
+
+
+if __name__ == "__main__":
+    ratteil()
