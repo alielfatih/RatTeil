@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,11 +8,11 @@ version = "2024.10.22.1"
 description = "Quran recitation streaming tool"
 readme = "README.md"
 license = {text = "MIT"}
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 authors = [
   {name = "Ali Elfatih", email = "alielfatih@hotmail.com"},
 ]
-keywords = ["quran", "recitation", "the holly Quran", "youtube", "streaming", "Live stream", "islam", "audio"]
+keywords = ["quran", "recitation", "the holy Quran", "youtube", "streaming", "live stream", "islam", "audio"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
@@ -32,19 +32,37 @@ classifiers = [
 ]
 
 dependencies = [
- "google-api-python-client==1.7.2",
- "google-auth==1.8.0",
- "google-auth-httplib2==0.0.3",
- "google-auth-oauthlib==0.4.1",
- "oauth2client",
+  "google-api-python-client>=1.7.2,<3.0.0",
+  "google-auth>=1.8.0,<3.0.0",
+  "google-auth-httplib2>=0.0.3,<1.0.0",
+  "google-auth-oauthlib>=0.4.1,<2.0.0",
+  "oauth2client>=4.0.0,<5.0.0",
+  "aiohttp>=3.8.0,<4.0.0",
+  "pydantic>=2.0.0,<3.0.0",
+  "pydantic-settings>=2.0.0,<3.0.0",
+  "typing-extensions>=4.0.0,<5.0.0",
 ]
-dynamic = ["readme"]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0.0,<8.0.0",
+  "pytest-asyncio>=0.21.0,<1.0.0",
+  "pytest-cov>=4.0.0,<5.0.0",
+  "httpx>=0.25.0,<1.0.0",
+  "responses>=0.24.0,<1.0.0",
+  "black>=23.0.0,<24.0.0",
+  "isort>=5.12.0,<6.0.0",
+  "flake8>=6.0.0,<7.0.0",
+  "mypy>=1.5.0,<2.0.0",
+  "types-aiohttp>=0.1.0,<1.0.0",
+  "types-requests>=2.0.0,<3.0.0",
+]
 
 [tool.setuptools.packages.find]
-where = ["src/"]  
-include = ["ratteil*"]  
+where = ["src/"]
+include = ["ratteil*"]
 exclude = ["test"]
-namespaces = false 
+namespaces = false
 
 [tool.setuptools]
 package-dir = {"" = "src"}
@@ -53,7 +71,8 @@ package-dir = {"" = "src"}
 readme = {file = ["README.md"], content-type = "text/markdown"}
 
 [project.scripts]
-ratteil = "ratteil:ratteil"
+ratteil = "ratteil.cli.main:main"
+ratteil-legacy = "ratteil:ratteil"
 
 [project.urls]
 Homepage = "https://github.com/alielfatih/ratteil"
