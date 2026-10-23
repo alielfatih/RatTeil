@@ -365,7 +365,6 @@ def handle_stream_command(args: argparse.Namespace) -> int:
     except Exception as api_error:
         logger.warning(f"API method failed, falling back to static data: {api_error}")
         # Fallback to old static method
-        from ratteil.reciters import reciters_id as recitersIdsDB, reciters as recitersDB
     
     # Convert args to options-like object
     class Options:
@@ -447,7 +446,6 @@ def handle_download_command(args: argparse.Namespace) -> int:
         except Exception as api_error:
             logger.warning(f"API method failed, falling back to static data: {api_error}")
             # Fallback to old static method
-            from ratteil.reciters import reciters_id as recitersIdsDB, reciters as recitersDB
         
         # Generate surahs list
         if args.all:
@@ -539,7 +537,6 @@ def handle_list_command(args: argparse.Namespace) -> int:
         # Fallback to old method if API fails
         try:
             from ratteil.cli.commands import handle_reciters_list
-            from ratteil.reciters import reciters_id as recitersIdsDB, reciters as recitersDB
             
             if args.resource in ["reciters", "all"]:
                 print("\nAvailable Reciters:")
@@ -552,7 +549,6 @@ def handle_list_command(args: argparse.Namespace) -> int:
                 )
             
             if args.resource in ["surahs", "all"]:
-                from ratteil.surahs import surah_list
                 print("\nAvailable Surahs:")
                 for i in range(1, 115):
                     surah_key = f"surah_{i}"
@@ -687,7 +683,6 @@ def handle_prepare_command(args: argparse.Namespace) -> int:
         except Exception as api_error:
             logger.warning(f"API method failed, falling back to static data: {api_error}")
             # Fallback to old static method
-            from ratteil.reciters import reciters_id as recitersIdsDB, reciters as recitersDB
         
         stream_service = StreamService(
             recitersDB,
@@ -768,7 +763,6 @@ def handle_validate_command(args: argparse.Namespace) -> int:
         except Exception as api_error:
             logger.warning(f"API method failed, falling back to static data: {api_error}")
             # Fallback to old static method
-            from ratteil.reciters import reciters_id as recitersIdsDB, reciters as recitersDB
         
         stream_service = StreamService(
             recitersDB,

@@ -94,19 +94,10 @@ class DownloadService:
                         })
         
         for x in surahs_list:
-            # filename_resolve returns (index, code, mtype) but SurahInfo now uses reciter_id
-            # We need to get reciter_id from code
-            from ratteil.reciters import reciters_by_id
             parts = filename_resolve(x)
             if len(parts) >= 3:
                 index, code, mtype = parts[0], parts[1], parts[2]
-                reciter_id = None
-                for rid, c in reciters_by_id.items():
-                    if c == code:
-                        reciter_id = rid
-                        break
-                if reciter_id is None:
-                    reciter_id = code
+                reciter_id = code
                 surah = SurahInfo(index, reciter_id, mtype, reciters_db)
             else:
                 surah = SurahInfo(*parts, reciters_db)

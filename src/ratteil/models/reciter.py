@@ -37,13 +37,8 @@ class Reciter:
 
     def __post_init__(self):
         """Initialize computed fields."""
-        from ratteil.reciters import reciters_by_id
-        
-        # Get code from reciter_id for backward compatibility
-        if isinstance(self.reciter_id, int):
-            self.code = reciters_by_id.get(self.reciter_id, str(self.reciter_id))
-        else:
-            self.code = reciters_by_id.get(int(self.reciter_id), str(self.reciter_id))
+        # Use reciter_id directly as code
+        self.code = str(self.reciter_id)
         
         reciter_data = self.reciters_db.get(self.code, {})
         self.name = reciter_data.get("name", "")

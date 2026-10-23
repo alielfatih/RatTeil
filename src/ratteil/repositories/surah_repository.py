@@ -31,7 +31,6 @@ class SurahRepository(SurahRepositoryProtocol):
         """
         self.surahs_db = surahs_db or {}
         if not self.surahs_db:
-            from ratteil.surahs import surah_list
             self.surahs_db = surah_list
     
     def get_surah(self, surah_id: int | str, reciter_id: int | str, moshaf_type: int | str) -> SurahInfo:

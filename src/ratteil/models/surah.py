@@ -44,18 +44,10 @@ class SurahInfo:
         """Initialize computed fields."""
         # Import here to avoid circular imports
         from ratteil.models.reciter import Reciter
-        from ratteil.reciters import reciters_by_id
-        from ratteil.surahs import surah_list as su_list
         
         self.id = str(self.index)
-        surah_key = f"surah_{self.id}"
-        self.name = su_list.get(surah_key, {}).get("name", "")
-        
-        # Get code from reciter_id for backward compatibility
-        if isinstance(self.reciter_id, int):
-            self.code = reciters_by_id.get(self.reciter_id, str(self.reciter_id))
-        else:
-            self.code = reciters_by_id.get(int(self.reciter_id), str(self.reciter_id))
+        # Use reciter_id directly as code
+        self.code = str(self.reciter_id)
         
         self.reciter = Reciter(self.reciter_id, self.reciters_db)
         self.moshaf = self.reciter.get_moshaf_name_url(int(self.mtype))

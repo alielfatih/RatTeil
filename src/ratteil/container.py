@@ -137,8 +137,6 @@ def _initialize_container(container: Container) -> None:
     container.register_instance(Settings, get_settings())
     
     # Register repositories
-    from ratteil.reciters import reciters as reciters_db
-    from ratteil.surahs import surah_list as surahs_db
     
     container.register(
         SurahRepository,

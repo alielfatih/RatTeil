@@ -8,7 +8,6 @@ from ratteil.config.constants import DEFAULT_DATA_DIR, DEFAULT_FIXER_DIR, DEFAUL
 from pathlib import Path
 from ratteil.cli.parser import create_parser
 from ratteil.cli.commands import pre_launcher, handle_reciters_list, handle_copyright
-from ratteil.reciters import reciters_id as recitersIdsDB, reciters as recitersDB
 import sys
 import os
 

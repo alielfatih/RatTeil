@@ -174,16 +174,7 @@ class QuranAPIClient:
         Returns:
             Dictionary mapping API IDs to codes
         """
-        try:
-            from ratteil.reciters import reciters as static_reciters
-            mapping = {}
-            for code, data in static_reciters.items():
-                reciter_id = data.get("id", 0)
-                if reciter_id:
-                    mapping[reciter_id] = code
-            return mapping
-        except Exception:
-            return {}
+        return {}
     
     async def get_surahs(self, language: str = "ar") -> List[Surah]:
         """

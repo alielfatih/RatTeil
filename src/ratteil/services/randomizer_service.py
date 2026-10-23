@@ -46,10 +46,9 @@ class RandomizerService:
         Returns:
             List of formatted strings describing each reciter
         """
-        from ratteil.reciters import reciters_by_id
         reciters_list = []
         for reciter_id in reciters_ids_db:
-            code = reciters_by_id.get(reciter_id, str(reciter_id))
+            code = str(reciter_id)
             reciter = Reciter(reciter_id, reciters_db)
             reciters_list.append(f"code: {reciter.code}\tname: {reciter.name}")
         return reciters_list
@@ -66,10 +65,9 @@ class RandomizerService:
         Returns:
             List of reciter IDs that have multiple moshafs
         """
-        from ratteil.reciters import reciters_by_id
         multi_reciters = []
         for reciter_id in reciters_ids_db:
-            code = reciters_by_id.get(reciter_id, str(reciter_id))
+            code = str(reciter_id)
             reciter = Reciter(reciter_id, reciters_db)
             if reciter.have_multi_moshafs:
                 multi_reciters.append(reciter_id)
@@ -92,7 +90,6 @@ class RandomizerService:
         Returns:
             Tuple of (selected_reciter_ids, selected_surahs_list)
         """
-        from ratteil.reciters import reciters_by_id
         temp_list = []
         if list_length > len(reciters_ids_list):
             if len(reciters_ids_list) == 1:

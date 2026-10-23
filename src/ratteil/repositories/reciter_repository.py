@@ -29,9 +29,6 @@ class ReciterRepository(ReciterRepositoryProtocol):
                         If None, will be loaded from ratteil.reciters.
         """
         self.reciters_db = reciters_db or {}
-        if not self.reciters_db:
-            from ratteil.reciters import reciters
-            self.reciters_db = reciters
     
     def get_reciter(self, reciter_id: int | str) -> Reciter:
         """
@@ -73,7 +70,6 @@ class ReciterRepository(ReciterRepositoryProtocol):
         Returns:
             List of reciter IDs that have multiple moshafs
         """
-        from ratteil.reciters import reciters_by_id
         multi_reciters = []
         for code, reciter_data in self.reciters_db.items():
             moshafs = reciter_data.get("moshaf", [])

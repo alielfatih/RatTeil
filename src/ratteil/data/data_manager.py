@@ -226,63 +226,15 @@ class QuranDataManager:
         self.logger.warning("Using default data (API and cache unavailable)")
         
         # Create default data from existing reciters.py
-        try:
-            from ratteil.reciters import reciters as reciters_dict, reciters_code
-            from ratteil.surahs import surah_list as surahs_dict
-            
-            # Convert old format to new
-            reciters = []
-            for code, reciter_data in reciters_dict.items():
-                moshafs = reciter_data.get("moshaf", [])
-                # Clean up server URLs
-                for moshaf in moshafs:
-                    if "server" in moshaf:
-                        moshaf["server"] = moshaf["server"].replace("\\/", "/").replace("\\\\", "")
-                
-                reciters.append(Reciter(
-                    id=reciter_data.get("id", len(reciters) + 1),
-                    code=code,
-                    name=reciter_data.get("name", code),
-                    letter=reciter_data.get("letter", ""),
-                    moshafs=moshafs,
-                    language="ar"
-                ))
-            
-            # Convert surahs
-            surahs = []
-            for i in range(1, 115):
-                surah_key = f"surah_{i}"
-                surah_data = surahs_dict.get(surah_key, {})
-                surahs.append(Surah(
-                    id=i,
-                    name=surah_data.get("name", f"Surah {i}"),
-                    arabic_name=surah_data.get("arabic", ""),
-                    ayahs=surah_data.get("ayahs", 0),
-                    language="ar"
-                ))
-            
-            return QuranData(
-                languages=[
-                    Language(code="ar", name="Arabic", native_name="العربية", rtl=True),
-                    Language(code="en", name="English", native_name="English", rtl=False),
-                ],
-                reciters=reciters,
-                surahs=surahs,
-                cached_at=None,
-                language="ar",
-                version="1.0"
-            )
-        except Exception as e:
-            self.logger.error(f"Failed to load default data: {e}")
-            # Return minimal data
-            return QuranData(
-                languages=[Language(code="ar", name="Arabic", native_name="العربية", rtl=True)],
-                reciters=[],
-                surahs=[],
-                cached_at=None,
-                language="ar",
-                version="1.0"
-            )
+        # Return minimal data
+        return QuranData(
+            languages=[Language(code="ar", name="Arabic", native_name="\u0627\u0644\u0639\u0631\u0628\u064a\u0629", rtl=True)],
+            reciters=[],
+            surahs=[],
+            cached_at=None,
+            language="ar",
+            version="1.0"
+        )
     
     def refresh(self) -> QuranData:
         """Force refresh data from API."""

@@ -114,29 +114,16 @@ class StreamService:
         Args:
             stream: List of audio file paths
         """
-        from ratteil.reciters import reciters_by_id
         parts = filename_resolve(r.choice(stream))
         index, code, mtype = parts[0], parts[1], parts[2]
-        reciter_id = None
-        for rid, c in reciters_by_id.items():
-            if c == code:
-                reciter_id = rid
-                break
-        if reciter_id is None:
-            reciter_id = code
+        reciter_id = code
         random_title = SurahInfo(index, reciter_id, mtype, self.reciters_db).reciter.name
         self.stream_title = f"{random_title} || \u0627\u0644\u0642\u0631\u0622\u0646 \u0627\u0644\u0643\u0631\u064a\u0645 \u0628\u062b \u0645\u0628\u0627\u0634\u0631"
         stream_d = ""
         for surah in stream:
             parts = filename_resolve(surah)
             index, code, mtype = parts[0], parts[1], parts[2]
-            reciter_id = None
-            for rid, c in reciters_by_id.items():
-                if c == code:
-                    reciter_id = rid
-                    break
-            if reciter_id is None:
-                reciter_id = code
+            reciter_id = code
             info = SurahInfo(index, reciter_id, mtype, self.reciters_db)
             stream_d += f"\n{info}"
         self.stream_description = stream_d
